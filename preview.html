@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鹿关宿舍 · 小程序预览</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  background: linear-gradient(135deg, #e8eaf6 0%, #f3e5f5 100%);
+  min-height: 100vh;
+  padding: 40px 20px;
+  color: #2c2c54;
+}
+
+.title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: #5e35b1;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #7575a0;
+  margin-bottom: 40px;
+  font-size: 14px;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.phone {
+  background: white;
+  border-radius: 32px;
+  padding: 16px;
+  box-shadow: 0 20px 60px rgba(94, 53, 177, 0.18);
+  position: relative;
+}
+
+.phone-title {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #7e57c2;
+  margin-bottom: 12px;
+}
+
+.phone-screen {
+  width: 100%;
+  aspect-ratio: 9/19;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #f7f5fb;
+  position: relative;
+  border: 8px solid #1a1a1a;
+}
+
+.screen-content {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+}
+
+.status-bar {
+  height: 32px;
+  background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* === 首页 === */
+.index-page .hero {
+  background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
+  padding: 16px;
+  padding-bottom: 60px;
+  color: white;
+}
+.index-page .user-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.index-page .avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffb74d 0%, #ff8f00 100%);
+  border: 3px solid rgba(255,255,255,0.4);
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+}
+.index-page .greeting {
+  font-size: 17px;
+  font-weight: 600;
+}
+.index-page .date {
+  font-size: 12px;
+  opacity: 0.85;
+}
+.index-page .stats-row {
+  background: rgba(255,255,255,0.18);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-around;
+  backdrop-filter: blur(8px);
+}
+.index-page .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+.index-page .stat-num {
+  font-size: 24px;
+  font-weight: 700;
+}
+.index-page .stat-label {
+  font-size: 11px;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+.index-page .stat-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255,255,255,0.3);
+}
+
+.index-page .cards {
+  padding: 0 16px;
+  margin-top: -32px;
+  position: relative;
+  z-index: 2;
+}
+.index-page .feature-card {
+  background: white;
+  border-radius: 20px;
+  padding: 18px 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(126,87,194,0.12);
+}
+.index-page .feature-card.checkin {
+  background: linear-gradient(135deg, #f3e5f5 0%, #ffffff 70%);
+}
+.index-page .feature-card.lottery {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffffff 70%);
+}
+.index-page .card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-right: 14px;
+}
+.index-page .checkin .card-icon { background: rgba(126,87,194,0.15); }
+.index-page .lottery .card-icon { background: rgba(255,143,0,0.15); }
+.index-page .card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c2c54;
+}
+.index-page .card-desc {
+  font-size: 12px;
+  color: #7575a0;
+  margin-top: 2px;
+}
+.index-page .card-arrow {
+  margin-left: auto;
+  font-size: 24px;
+  color: #b39ddb;
+}
+
+.index-page .overview-card {
+  margin: 0 16px 16px;
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(126,87,194,0.08);
+}
+.index-page .section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c2c54;
+  margin-bottom: 12px;
+}
+.index-page .overview-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0edf7;
+}
+.index-page .overview-row:last-child { border-bottom: none; }
+.index-page .overview-label {
+  font-size: 13px;
+  color: #7575a0;
+}
+.index-page .overview-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.index-page .overview-name {
+  font-size: 13px;
+  color: #2c2c54;
+  font-weight: 500;
+}
+.index-page .overview-time {
+  font-size: 14px;
+  font-weight: 700;
+  color: #7e57c2;
+}
+.index-page .overview-result {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+.index-page .result-deer {
+  background: rgba(102,187,106,0.15);
+  color: #2e7d32;
+}
+
+/* === 打卡页 === */
+.checkin-page .hero {
+  background: linear-gradient(135deg, #9575cd 0%, #5e35b1 100%);
+  padding: 16px 16px 80px;
+  text-align: center;
+  color: white;
+}
+.checkin-page .current-time {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-family: "Courier New", monospace;
+  margin-top: 8px;
+}
+.checkin-page .checkin-date {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-bottom: 24px;
+}
+.checkin-page .big-btn {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  border: 4px solid rgba(255,255,255,0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+.checkin-page .big-btn-icon {
+  font-size: 44px;
+}
+.checkin-page .big-btn-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #5e35b1;
+  margin-top: 6px;
+}
+.checkin-page .big-btn.checked {
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+}
+.checkin-page .big-btn.checked .big-btn-text { color: white; }
+
+.checkin-page .content {
+  padding: 0 16px;
+  margin-top: -56px;
+  position: relative;
+  z-index: 2;
+}
+.checkin-page .tabs {
+  display: flex;
+  background: white;
+  border-radius: 14px;
+  padding: 4px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 16px rgba(126,87,194,0.08);
+}
+.checkin-page .tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 13px;
+  color: #7575a0;
+  border-radius: 10px;
+}
+.checkin-page .tab.active {
+  background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
+  color: white;
+  font-weight: 600;
+}
+.checkin-page .card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(126,87,194,0.08);
+}
+.checkin-page .rank-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0edf7;
+}
+.checkin-page .rank-item:last-child { border-bottom: none; }
+.checkin-page .rank-no {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f0edf7;
+  color: #7575a0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  margin-right: 10px;
+}
+.checkin-page .rank-no.top {
+  background: linear-gradient(135deg, #ffb74d 0%, #ff8f00 100%);
+  color: white;
+}
+.checkin-page .rank-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+}
+.checkin-page .rank-info { flex: 1; }
+.checkin-page .rank-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c2c54;
+}
+.checkin-page .rank-time {
+  font-size: 11px;
+  color: #7575a0;
+  margin-top: 2px;
+}
+.checkin-page .me-tag {
+  background: #7e57c2;
+  color: white;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-left: 4px;
+}
+
+/* === 抽签页 === */
+.lottery-page .hero {
+  background: linear-gradient(135deg, #ffb74d 0%, #ff8f00 100%);
+  padding: 24px 16px 80px;
+  text-align: center;
+  color: white;
+}
+.lottery-page .lottery-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+.lottery-page .lottery-subtitle {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-bottom: 20px;
+}
+.lottery-page .stick-box {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18),
+              inset 0 -4px 12px rgba(255,143,0,0.2);
+  border: 4px solid rgba(255,255,255,0.6);
+  position: relative;
+}
+.lottery-page .stick-emoji {
+  font-size: 80px;
+}
+.lottery-page .stick-result.deer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lottery-page .stick-result.deer .result-emoji { font-size: 64px; }
+.lottery-page .stick-result.deer .result-text {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2e7d32;
+  letter-spacing: 4px;
+}
+.lottery-page .lottery-cta {
+  margin-top: 16px;
+  display: inline-block;
+  background: rgba(255,255,255,0.95);
+  color: #5d4037;
+  padding: 8px 18px;
+  border-radius: 16px;
+  font-size: 13px;
+}
+.lottery-page .lottery-cta .tag-deer {
+  background: rgba(46,125,50,0.15);
+  color: #2e7d32;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin: 0 4px;
+}
+
+.lottery-page .content {
+  padding: 0 16px;
+  margin-top: -56px;
+  position: relative;
+  z-index: 2;
+}
+.lottery-page .stats-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 16px rgba(126,87,194,0.08);
+}
+.lottery-page .stats-grid {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 12px;
+}
+.lottery-page .stats-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+.lottery-page .cell-num {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c2c54;
+}
+.lottery-page .cell-num.deer-color { color: #2e7d32; }
+.lottery-page .cell-num.not-deer-color { color: #8d6e63; }
+.lottery-page .cell-label {
+  font-size: 11px;
+  color: #7575a0;
+  margin-top: 2px;
+}
+.lottery-page .stats-divider {
+  width: 1px;
+  height: 36px;
+  background: #ece9f5;
+}
+.lottery-page .bar-chart {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f0edf7;
+}
+.lottery-page .bar-segment.deer {
+  background: linear-gradient(90deg, #66bb6a 0%, #43a047 100%);
+}
+.lottery-page .bar-segment.not-deer {
+  background: linear-gradient(90deg, #bcaaa4 0%, #8d6e63 100%);
+}
+
+/* === 个人页 === */
+.profile-page .hero {
+  background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
+  padding: 24px 16px 60px;
+  color: white;
+}
+.profile-page .hero-inner {
+  display: flex;
+  align-items: center;
+}
+.profile-page .big-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+  border: 3px solid rgba(255,255,255,0.5);
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: white;
+  font-weight: 700;
+}
+.profile-page .big-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+.profile-page .join-tip {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+.profile-page .edit-btn {
+  margin-left: auto;
+  background: rgba(255,255,255,0.25);
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+.profile-page .content {
+  padding: 0 16px;
+  margin-top: -40px;
+  position: relative;
+  z-index: 2;
+}
+.profile-page .section {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 16px rgba(126,87,194,0.08);
+}
+.profile-page .section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.profile-page .data-grid {
+  display: flex;
+  justify-content: space-around;
+}
+.profile-page .data-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+.profile-page .data-num {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c2c54;
+}
+.profile-page .data-num.highlight { color: #7e57c2; }
+.profile-page .data-num.deer-color { color: #2e7d32; }
+.profile-page .data-num.not-deer-color { color: #8d6e63; }
+.profile-page .data-label {
+  font-size: 11px;
+  color: #7575a0;
+  margin-top: 2px;
+}
+.profile-page .data-divider {
+  width: 1px;
+  height: 36px;
+  background: #ece9f5;
+}
+.profile-page .rate-bar {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #f0edf7;
+  display: flex;
+  align-items: center;
+}
+.profile-page .rate-label {
+  font-size: 12px;
+  color: #7575a0;
+  width: 100px;
+}
+.profile-page .rate-progress {
+  flex: 1;
+  height: 8px;
+  background: #f0edf7;
+  border-radius: 4px;
+  margin: 0 8px;
+  overflow: hidden;
+}
+.profile-page .rate-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7e57c2 0%, #5e35b1 100%);
+  width: 86%;
+}
+.profile-page .rate-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #7e57c2;
+  width: 40px;
+  text-align: right;
+}
+
+/* 底部 Tab 栏 */
+.tab-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: white;
+  border-top: 1px solid #ece9f5;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding-bottom: 6px;
+}
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  color: #999999;
+  font-size: 10px;
+}
+.tab-item.active {
+  color: #7e57c2;
+}
+.tab-item .icon {
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+@media (max-width: 768px) {
+  .preview-grid {
+    grid-template-columns: 1fr;
+  }
+  .phone { max-width: 360px; margin: 0 auto; }
+}
+
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  padding: 20px;
+  color: #7e57c2;
+  font-size: 13px;
+}
+</style>
+</head>
+<body>
+
+<h1 class="title">🦌 鹿关宿舍 · 小程序设计预览</h1>
+<p class="subtitle">微信小程序 4 个核心页面设计效果</p>
+
+<div class="preview-grid">
+
+  <!-- 首页 -->
+  <div class="phone">
+    <div class="phone-title">📱 首页 · 功能入口</div>
+    <div class="phone-screen index-page">
+      <div class="screen-content">
+        <div class="status-bar">15:14</div>
+        <div class="hero">
+          <div class="user-row">
+            <div class="avatar">小</div>
+            <div>
+              <div class="greeting">晚上好，小鹿</div>
+              <div class="date">2026年9月30日 周三</div>
+            </div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-item">
+              <div class="stat-num">4/6</div>
+              <div class="stat-label">已回宿舍</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-num">3/6</div>
+              <div class="stat-label">已抽签</div>
+            </div>
+          </div>
+        </div>
+        <div class="cards">
+          <div class="feature-card checkin">
+            <div class="card-icon">🏠</div>
+            <div>
+              <div class="card-title">每日打卡</div>
+              <div class="card-desc">点我回宿舍打卡</div>
+            </div>
+            <div class="card-arrow">›</div>
+          </div>
+          <div class="feature-card lottery">
+            <div class="card-icon">🎋</div>
+            <div>
+              <div class="card-title">鹿关抽签</div>
+              <div class="card-desc">每日一签，看看今日运势</div>
+            </div>
+            <div class="card-arrow">›</div>
+          </div>
+        </div>
+        <div class="overview-card">
+          <div class="section-title">今日宿舍速览</div>
+          <div class="overview-row">
+            <div class="overview-label">📍 最晚回宿舍</div>
+            <div class="overview-value">
+              <span class="overview-name">阿强</span>
+              <span class="overview-time">23:45</span>
+            </div>
+          </div>
+          <div class="overview-row">
+            <div class="overview-label">🎯 最近抽签</div>
+            <div class="overview-value">
+              <span class="overview-name">小李</span>
+              <span class="overview-result result-deer">鹿</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab-item active">
+            <div class="icon">🏠</div>
+            <div>首页</div>
+          </div>
+          <div class="tab-item">
+            <div class="icon">⏰</div>
+            <div>打卡</div>
+          </div>
+          <div class="tab-item">
+            <div class="icon">🎋</div>
+            <div>鹿关抽签</div>
+          </div>
+          <div class="tab-item">
+            <div class="icon">👤</div>
+            <div>我的</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 打卡页 -->
+  <div class="phone">
+    <div class="phone-title">⏰ 每日打卡 · 大按钮打卡</div>
+    <div class="phone-screen checkin-page">
+      <div class="screen-content">
+        <div class="status-bar">15:14</div>
+        <div class="hero">
+          <div class="current-time">15:14:25</div>
+          <div class="checkin-date">2026-09-30</div>
+          <div class="big-btn">
+            <div class="big-btn-icon">🏠</div>
+            <div class="big-btn-text">点击打卡</div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="tabs">
+            <div class="tab active">今日排行</div>
+            <div class="tab">我的记录</div>
+          </div>
+          <div class="card">
+            <div class="rank-item">
+              <div class="rank-no top">1</div>
+              <div class="rank-avatar" style="background: linear-gradient(135deg, #ffb74d, #ff8f00)">小</div>
+              <div class="rank-info">
+                <div class="rank-name">小鹿 <span class="me-tag">我</span></div>
+                <div class="rank-time">17:30 打卡</div>
+              </div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-no top">2</div>
+              <div class="rank-avatar" style="background: linear-gradient(135deg, #66bb6a, #43a047)">阿</div>
+              <div class="rank-info">
+                <div class="rank-name">阿强</div>
+                <div class="rank-time">18:45 打卡</div>
+              </div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-no top">3</div>
+              <div class="rank-avatar" style="background: linear-gradient(135deg, #42a5f5, #1976d2)">小</div>
+              <div class="rank-info">
+                <div class="rank-name">小李</div>
+                <div class="rank-time">20:12 打卡</div>
+              </div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-no">4</div>
+              <div class="rank-avatar" style="background: linear-gradient(135deg, #ab47bc, #7b1fa2)">阿</div>
+              <div class="rank-info">
+                <div class="rank-name">阿明</div>
+                <div class="rank-time">23:45 打卡</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab-item">
+            <div class="icon">🏠</div>
+            <div>首页</div>
+          </div>
+          <div class="tab-item active">
+            <div class="icon">⏰</div>
+            <div>打卡</div>
+          </div>
+          <div class="tab-item">
+            <div class="icon">🎋</div>
+            <div>鹿关抽签</div>
+          </div>
+          <div class="tab-item">
+            <div class="icon">👤</div>
+            <div>我的</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 抽签页 -->
+  <div class="phone">
+    <div class="phone-title">🎋 鹿关抽签 · 摇一摇</div>
+    <div class="phone-screen lottery-page">
+      <div class="screen-content">
+        <div class="status-bar">15:14</div>
+        <div class="hero">
+          <div class="lottery-title">鹿关抽签</div>
+          <div class="lottery-subtitle">2026-09-30</div>
+          <div class="stick-box">
+            <div class="stick-result deer">
+              <div class="result-emoji">🦌</div>
+              <div class="result-text">鹿</div>
+            </div>
+          </div>
+          <div class="lottery-cta">
+            今日签运：<span class="tag-deer">鹿</span> · 14:32
+          </div>
+        </div>
+        <div class="content">
+          <div class="stats-card">
+            <div class="section-title">今日签运分布</div>
+            <div class="stats-grid">
+              <div class="stats-cell">
+                <div class="cell-num deer-color">2</div>
+                <div class="cell-label">鹿</div>
+              </div>
+              <div class="stats-divider"></div>
+              <div class="stats-cell">
+                <div class="cell-num not-deer-color">1</div>
+                <div class="cell-label">不鹿</div>
+              </div>
+              <div class="stats-divider"></div>
+              <div class="stats-cell">
+                <div class="cell-num">3/6</div>
+                <div class="cell-label">已抽</div>
+              </div>
+            </div>
+            <div class="bar-chart">
+              <div class="bar-segment deer" style="width: 66%"></div>
+              <div class="bar-segment not-deer" style="width: 34%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab-item">
+            <div class="icon">🏠</div>
+            <div>首页</div>
+          </div>
+          <div class="tab-item">
+            <div class="icon">⏰</div>
+            <div>打卡</div>
+          </div>
+          <div class="tab-item active">
+            <div class="icon">🎋</div>
+            <div>鹿关抽签</div>
+          </div>
+          <div class="tab-item">
+            <div class="icon">👤</div>
+            <div>我的</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 个人页 -->
+  <div class="phone">
+    <div class="phone-title">👤 我的 · 数据看板</div>
+    <div class="phone-screen profile-page">
+      <div class="screen-content">
+        <div class="status-bar">15:14</div>
+        <div class="hero">
+          <div class="hero-inner">
+            <div class="big-avatar">小</div>
+            <div>
+              <div class="big-name">小鹿</div>
+              <div class="join-tip">鹿关宿舍成员</div>
+            </div>
+            <div class="edit-btn">编辑</div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="section">
+            <div class="section-title">📊 打卡数据</div>
+            <div class="data-grid">
+              <div class="data-cell">
+                <div class="data-num">42</div>
+                <div class="data-label">累计打卡</div>
+              </div>
+              <div class="data-divider"></div>
+              <div class="data-cell">
+                <div class="data-num highlight">7</div>
+                <div class="data-label">连续天数</div>
+              </div>
+              <div class="data-divider"></div>
+              <div class="data-cell">
+                <div class="data-num">14</div>
+                <div class="data-label">最长连签</div>
+              </div>
+            </div>
+            <div class="rate-bar">
+              <div class="rate-label">最近 7 天打卡率</div>
+              <div class="rate-progress">
+                <div class="rate-fill"></div>
+              </div>
+              <div class="rate-text">86%</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">🎋 抽签统计</div>
+            <div class="data-grid">
+              <div class="data-cell">
+                <div class="data-num">28</div>
+                <div class="data-label">累计抽签</div>
+              </div>
+              <div class="data-divider"></div>
+              <div class="data-cell">
+                <div class="data-num deer-color">15</div>
+                <div class="data-label">鹿</div>
+              </div>
+              <div class="data-divider"></div>
+              <div class="data-cell">
+                <div class="data-num not-deer-color">13</div>
+                <div class="data-label">不鹿</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab-item">
+            <div class="icon">🏠</div>
+            <div>首页</div>
+          </div>
+          <div class="tab-item">
+            <div class="icon">⏰</div>
+            <div>打卡</div>
+          </div>
+          <div class="tab-item">
+            <div class="icon">🎋</div>
+            <div>鹿关抽签</div>
+          </div>
+          <div class="tab-item active">
+            <div class="icon">👤</div>
+            <div>我的</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  ✨ 使用微信开发者工具导入 miniprogram 目录，按步骤配置云开发即可在真机预览 ✨
+</div>
+
+</body>
+</html>

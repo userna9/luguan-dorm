@@ -1,0 +1,9 @@
+{
+  "name": "saveUserInfo",
+  "version": "1.0.0",
+  "description": "保存用户的昵称和头像到 users 集合",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

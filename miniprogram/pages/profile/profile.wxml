@@ -1,0 +1,111 @@
+<view class="page-profile">
+  <!-- 用户卡片 -->
+  <view class="profile-hero">
+    <view class="hero-bg"></view>
+    <view class="hero-inner">
+      <image class="big-avatar" src="{{avatarUrl || 'images/profile.png'}}" mode="aspectFill"></image>
+      <view class="user-meta">
+        <view class="big-name">{{nickname || '设置昵称'}}</view>
+        <view class="join-tip">鹿关宿舍成员</view>
+      </view>
+      <view class="edit-btn" bindtap="onEditProfile">编辑</view>
+    </view>
+  </view>
+
+  <!-- 打卡数据 -->
+  <view class="section">
+    <view class="section-title">📊 打卡数据</view>
+    <view class="data-grid">
+        <view class="data-cell">
+          <view class="data-num">{{totalCheckins}}</view>
+          <view class="data-label">累计打卡</view>
+        </view>
+        <view class="data-divider"></view>
+        <view class="data-cell">
+          <view class="data-num highlight">{{currentStreak}}</view>
+          <view class="data-label">连续天数</view>
+        </view>
+        <view class="data-divider"></view>
+        <view class="data-cell">
+          <view class="data-num">{{longestStreak}}</view>
+          <view class="data-label">最长连签</view>
+        </view>
+      </view>
+      <view class="rate-bar">
+        <view class="rate-label">最近 7 天打卡率</view>
+        <view class="rate-progress">
+          <view class="rate-fill" style="width: {{checkinRate}}%"></view>
+        </view>
+        <view class="rate-text">{{checkinRate}}%</view>
+      </view>
+  </view>
+
+  <!-- 抽签数据 -->
+  <view class="section">
+    <view class="section-title">🎋 抽签统计</view>
+    <view class="data-grid">
+      <view class="data-cell">
+        <view class="data-num">{{totalLottery}}</view>
+        <view class="data-label">累计抽签</view>
+      </view>
+      <view class="data-divider"></view>
+      <view class="data-cell">
+        <view class="data-num deer-color">{{deerCount}}</view>
+        <view class="data-label">鹿</view>
+      </view>
+      <view class="data-divider"></view>
+      <view class="data-cell">
+        <view class="data-num not-deer-color">{{notDeerCount}}</view>
+        <view class="data-label">不鹿</view>
+      </view>
+    </view>
+    <view class="dual-info" wx:if="{{totalLottery > 0}}">
+      鹿运指数：<text class="highlight">{{deerRate}}%</text>
+    </view>
+  </view>
+
+  <view class="footer-tip">
+    鹿关宿舍 · 一起打卡一起抽签 ✨
+  </view>
+</view>
+
+<!-- 编辑弹窗 -->
+<view class="modal-mask {{keyboardUp ? 'keyboard-up' : ''}}" wx:if="{{showEditModal}}" bindtap="closeEditModal">
+  <view class="modal-card" catchtap="noop">
+    <view class="modal-title">编辑个人资料</view>
+
+    <view class="form-item">
+      <view class="form-label">头像</view>
+      <view class="avatar-row">
+        <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+          <image class="avatar-large" src="{{avatarUrl || ''}}" wx:if="{{avatarUrl}}"></image>
+          <view class="avatar-placeholder" wx:else>+</view>
+        </button>
+        <view class="avatar-side">
+          <view class="avatar-tip">点圆形选微信头像</view>
+          <view class="avatar-album-link" bindtap="onPickAvatarFromAlbum">从相册选择</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">昵称</view>
+      <input
+        class="nickname-input"
+        type="text"
+        placeholder="点击输入你的昵称"
+        value="{{nicknameInitial}}"
+        maxlength="20"
+        adjust-position="{{false}}"
+        bindinput="onNicknameInput"
+        bindfocus="onNicknameFocus"
+        bindblur="onNicknameBlur"
+      />
+    </view>
+
+    <view class="modal-buttons">
+      <button class="btn-primary" bindtap="onSaveProfile">保存</button>
+      <button class="btn-secondary" bindtap="closeEditModal" style="margin-top: 16rpx;">取消</button>
+    </view>
+  </view>
+</view>

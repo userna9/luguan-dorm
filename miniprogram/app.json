@@ -1,0 +1,57 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/checkin/checkin",
+    "pages/lottery/lottery",
+    "pages/moments/moments",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#7e57c2",
+    "navigationBarTitleText": "乱世诸雄",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f7f5fb"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#7e57c2",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/checkin/checkin",
+        "text": "回寝登记",
+        "iconPath": "images/checkin.png",
+        "selectedIconPath": "images/checkin-active.png"
+      },
+      {
+        "pagePath": "pages/lottery/lottery",
+        "text": "鹿关抽签",
+        "iconPath": "images/lottery.png",
+        "selectedIconPath": "images/lottery-active.png"
+      },
+      {
+        "pagePath": "pages/moments/moments",
+        "text": "宿舍空间",
+        "iconPath": "images/moments.png",
+        "selectedIconPath": "images/moments-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

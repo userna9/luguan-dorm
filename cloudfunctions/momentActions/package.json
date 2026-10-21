@@ -1,0 +1,9 @@
+{
+  "name": "momentActions",
+  "version": "1.0.0",
+  "description": "宿舍空间动态操作：点赞/取消点赞/删除动态",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
