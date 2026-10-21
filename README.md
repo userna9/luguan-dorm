@@ -312,7 +312,7 @@ const result = results[Math.floor(Math.random() * results.length)]
 如果已经配好 OSS 但老照片还是不显示，执行一次迁移：`{"action":"migrate"}`（指南第 6 节）。
 
 ### Q7：想和室友一起开发，怎么协作？
-答：见 [docs/协作开发指南.md](docs/协作开发指南.md)。
+答：见 [docs/协作开发指南.md](docs/协作开发指南.md)，Git 命令速查见 [docs/Git常用指令.md](docs/Git常用指令.md)。
 
 核心四条：
 1. 小程序后台「成员管理」把室友加为开发者（不加就编译不了）
