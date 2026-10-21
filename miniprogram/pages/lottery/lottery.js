@@ -2,6 +2,7 @@
 const app = getApp()
 const db = wx.cloud.database()
 const { getAvatarMap, pickAvatar } = require('../../utils/users.js')
+const { dormDateStr } = require('../../utils/dorm.js')
 
 Page({
   data: {
@@ -22,25 +23,14 @@ Page({
     activeTab: 'today', // today | history
   },
 
-  onLoad() {
-    const today = new Date()
-    this.setData({ todayDate: this.formatDate(today) })
-    this.loadData()
-  },
-
   onShow() {
+    // 按「宿舍日」算，每次显示都重算：小程序可能从昨晚一直挂到今天
+    this.setData({ todayDate: dormDateStr() })
     this.loadData()
   },
 
   onPullDownRefresh() {
     this.loadData().then(() => wx.stopPullDownRefresh())
-  },
-
-  formatDate(d) {
-    const y = d.getFullYear()
-    const m = String(d.getMonth() + 1).padStart(2, '0')
-    const day = String(d.getDate()).padStart(2, '0')
-    return `${y}-${m}-${day}`
   },
 
   formatTime(date) {
@@ -154,6 +144,25 @@ Page({
           return
         }
         const user = userRes.data[0]
+
+        // 写入前再确认一次今天没抽过（页面数据可能还没加载完，或在另一台手机上抽过）
+        const existRes = await db.collection('lottery')
+          .where({ _openid: openid, date: this.data.todayDate })
+          .limit(1)
+          .get()
+        if (existRes.data && existRes.data.length) {
+          const mine = existRes.data[0]
+          this.setData({
+            drawing: false,
+            shakeClass: '',
+            showResult: true,
+            hasLottery: true,
+            myResult: mine.result,
+            myLotteryTime: this.formatTime(mine.timestamp),
+          })
+          this.loadTodayLottery()
+          return
+        }
 
         const now = new Date()
         await db.collection('lottery').add({

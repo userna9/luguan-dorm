@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "鹿关抽签",
   "enablePullDownRefresh": true,
-  "backgroundColor": "#f7f5fb"
+  "backgroundColor": "#e4ece2",
+  "backgroundTextStyle": "dark"
 }

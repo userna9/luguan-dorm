@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "宿舍空间",
   "enablePullDownRefresh": true,
-  "backgroundTextStyle": "light"
+  "backgroundTextStyle": "dark",
+  "backgroundColor": "#e4ece2"
 }

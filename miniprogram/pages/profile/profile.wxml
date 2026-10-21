@@ -1,78 +1,76 @@
 <view class="page-profile">
-  <!-- 用户卡片 -->
-  <view class="profile-hero">
-    <view class="hero-bg"></view>
-    <view class="hero-inner">
-      <image class="big-avatar" src="{{avatarUrl || 'images/profile.png'}}" mode="aspectFill"></image>
-      <view class="user-meta">
-        <view class="big-name">{{nickname || '设置昵称'}}</view>
-        <view class="join-tip">鹿关宿舍成员</view>
+  <!-- 我 -->
+  <view class="me">
+    <image class="me-avatar" src="{{avatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
+    <view class="me-name serif">{{nickname || '还没设置昵称'}}</view>
+    <view class="me-sub">鹿关宿舍成员</view>
+    <view class="me-edit" bindtap="onEditProfile">编辑资料</view>
+  </view>
+
+  <!-- 回寝登记 -->
+  <view class="section-head"><text class="h">回寝登记</text></view>
+  <view class="sheet stats">
+    <view class="figures">
+      <view class="figure">
+        <view class="figure-num serif">{{totalCheckins}}</view>
+        <view class="figure-label">累计登记</view>
       </view>
-      <view class="edit-btn" bindtap="onEditProfile">编辑</view>
+      <view class="figure">
+        <view class="figure-num serif lit">{{currentStreak}}</view>
+        <view class="figure-label">连续天数</view>
+      </view>
+      <view class="figure">
+        <view class="figure-num serif">{{longestStreak}}</view>
+        <view class="figure-label">最长连续</view>
+      </view>
+    </view>
+    <view class="meter">
+      <view class="meter-head">
+        <text>最近 7 天登记率</text>
+        <text class="meter-val serif">{{checkinRate}}%</text>
+      </view>
+      <view class="meter-track">
+        <view class="meter-fill lamp" style="width: {{checkinRate}}%"></view>
+      </view>
     </view>
   </view>
 
-  <!-- 打卡数据 -->
-  <view class="section">
-    <view class="section-title">📊 打卡数据</view>
-    <view class="data-grid">
-        <view class="data-cell">
-          <view class="data-num">{{totalCheckins}}</view>
-          <view class="data-label">累计打卡</view>
-        </view>
-        <view class="data-divider"></view>
-        <view class="data-cell">
-          <view class="data-num highlight">{{currentStreak}}</view>
-          <view class="data-label">连续天数</view>
-        </view>
-        <view class="data-divider"></view>
-        <view class="data-cell">
-          <view class="data-num">{{longestStreak}}</view>
-          <view class="data-label">最长连签</view>
-        </view>
+  <!-- 抽签 -->
+  <view class="section-head"><text class="h">鹿关抽签</text></view>
+  <view class="sheet stats">
+    <view class="figures">
+      <view class="figure">
+        <view class="figure-num serif">{{totalLottery}}</view>
+        <view class="figure-label">累计抽签</view>
       </view>
-      <view class="rate-bar">
-        <view class="rate-label">最近 7 天打卡率</view>
-        <view class="rate-progress">
-          <view class="rate-fill" style="width: {{checkinRate}}%"></view>
-        </view>
-        <view class="rate-text">{{checkinRate}}%</view>
+      <view class="figure">
+        <view class="figure-num serif deer">{{deerCount}}</view>
+        <view class="figure-label">鹿</view>
       </view>
-  </view>
-
-  <!-- 抽签数据 -->
-  <view class="section">
-    <view class="section-title">🎋 抽签统计</view>
-    <view class="data-grid">
-      <view class="data-cell">
-        <view class="data-num">{{totalLottery}}</view>
-        <view class="data-label">累计抽签</view>
-      </view>
-      <view class="data-divider"></view>
-      <view class="data-cell">
-        <view class="data-num deer-color">{{deerCount}}</view>
-        <view class="data-label">鹿</view>
-      </view>
-      <view class="data-divider"></view>
-      <view class="data-cell">
-        <view class="data-num not-deer-color">{{notDeerCount}}</view>
-        <view class="data-label">不鹿</view>
+      <view class="figure">
+        <view class="figure-num serif leaf">{{notDeerCount}}</view>
+        <view class="figure-label">不鹿</view>
       </view>
     </view>
-    <view class="dual-info" wx:if="{{totalLottery > 0}}">
-      鹿运指数：<text class="highlight">{{deerRate}}%</text>
+    <view class="meter" wx:if="{{totalLottery > 0}}">
+      <view class="meter-head">
+        <text>鹿运指数</text>
+        <text class="meter-val serif">{{deerRate}}%</text>
+      </view>
+      <view class="meter-track leaf-track">
+        <view class="meter-fill" style="width: {{deerRate}}%"></view>
+      </view>
     </view>
   </view>
 
-  <view class="footer-tip">
-    鹿关宿舍 · 一起打卡一起抽签 ✨
-  </view>
+  <view class="colophon">六个人，一间屋</view>
 </view>
 
 <!-- 编辑弹窗 -->
 <view class="modal-mask {{keyboardUp ? 'keyboard-up' : ''}}" wx:if="{{showEditModal}}" bindtap="closeEditModal">
   <view class="modal-card" catchtap="noop">
-    <view class="modal-title">编辑个人资料</view>
+    <view class="modal-title">编辑资料</view>
+    <view class="modal-subtitle">改完点保存，室友那边会同步更新</view>
 
     <view class="form-item">
       <view class="form-label">头像</view>
@@ -82,7 +80,7 @@
           <view class="avatar-placeholder" wx:else>+</view>
         </button>
         <view class="avatar-side">
-          <view class="avatar-tip">点圆形选微信头像</view>
+          <view class="avatar-tip">点圆形，用微信头像</view>
           <view class="avatar-album-link" bindtap="onPickAvatarFromAlbum">从相册选择</view>
         </view>
       </view>
@@ -93,7 +91,7 @@
       <input
         class="nickname-input"
         type="text"
-        placeholder="点击输入你的昵称"
+        placeholder="室友平时怎么叫你"
         value="{{nicknameInitial}}"
         maxlength="20"
         adjust-position="{{false}}"
@@ -105,7 +103,7 @@
 
     <view class="modal-buttons">
       <button class="btn-primary" bindtap="onSaveProfile">保存</button>
-      <button class="btn-secondary" bindtap="closeEditModal" style="margin-top: 16rpx;">取消</button>
+      <button class="btn-secondary" bindtap="closeEditModal">取消</button>
     </view>
   </view>
 </view>
