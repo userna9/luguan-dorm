@@ -15,13 +15,32 @@ const cloud = require('wx-server-sdk')
 const crypto = require('crypto')
 const https = require('https')
 
-// config.js 里是密钥，默认不提交到仓库；缺失时自动退回只读环境变量
+// config.js 里是密钥，默认不提交到仓库；缺失时直接读环境变量
+function readEnvConfig() {
+  return {
+    region: process.env.OSS_REGION || '',
+    bucket: process.env.OSS_BUCKET || '',
+    accessKeyId: process.env.OSS_AK_ID || '',
+    accessKeySecret: process.env.OSS_AK_SECRET || '',
+  }
+}
+
 let cfg = {}
 try {
   cfg = require('./config')
 } catch (e) {
-  cfg = {}
-  console.warn('未找到 config.js，仅使用环境变量配置 OSS')
+  // 没有 config.js 时不能用空对象，否则环境变量读不到
+  cfg = readEnvConfig()
+  console.warn('未找到 config.js，改用环境变量配置 OSS')
+}
+
+// 兜底：config.js 存在但某个字段是空的，仍然用环境变量补上
+const envCfg = readEnvConfig()
+cfg = {
+  region: cfg.region || envCfg.region,
+  bucket: cfg.bucket || envCfg.bucket,
+  accessKeyId: cfg.accessKeyId || envCfg.accessKeyId,
+  accessKeySecret: cfg.accessKeySecret || envCfg.accessKeySecret,
 }
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
