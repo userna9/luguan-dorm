@@ -1,0 +1,26 @@
+<view class="yard-page">
+  <view class="eyebrow">六个人，一起养点喜欢的东西</view>
+  <view class="yard-title">今天，也有人等你回来</view>
+  <view class="connection" wx:if="{{mode !== 'shared'}}">
+    <text>{{mode === 'demo' ? '本机试玩 · 仅保存在这台手机，不与室友同步' : (mode === 'connecting' ? '正在打开小院…' : error)}}</text>
+    <view class="connection-actions" wx:if="{{mode === 'error'}}"><button size="mini" bindtap="connect">重试共养</button><button size="mini" bindtap="startDemo">本机试玩</button></view>
+    <button size="mini" wx:if="{{mode === 'demo'}}" bindtap="backOnline">连接共养</button>
+  </view>
+  <view class="scene-wrap">
+    <canvas type="2d" id="yard" class="yard-canvas" bindtouchstart="canvasTouch" aria-label="像素小院：点狗狗摸头，点花盆照顾，点树接力"></canvas>
+    <view class="speech" bindtap="touchDog">{{bubble}}</view>
+    <view class="scene-controls"><text>点花盆照顾 · 点树接力</text><view bindtap="toggleMotion">{{motion ? '暂停动画' : '播放动画'}}</view></view>
+  </view>
+  <view class="pet-row"><view><view class="pet-name">{{petName}}</view><view class="muted">{{personality || '有点黏人 · 偶尔发疯'}}</view></view><button class="outline" bindtap="namePet" disabled="{{!state || busy}}">{{state.petName ? '大家选的名字' : '一起起名'}} ›</button></view>
+  <view class="care-row"><button wx:for="{{actions}}" wx:key="id" class="care" data-action="{{item.id}}" bindtap="care" disabled="{{!state || busy}}"><view class="care-pixel {{item.id}}">{{item.mark}}</view><view>{{item.label}}</view><view class="care-count" wx:if="{{state}}">今天 {{state.counts[item.id]}} 次</view></button></view>
+  <view class="event-card" wx:if="{{state}}"><view class="eyebrow">今天的小插曲 · {{eventCount}}/3 位室友参与</view><view class="event-title">{{event.title}}</view><view class="event-text">{{state.eventDone ? event.end : event.text}}</view><view class="event-roles" wx:if="{{!state.eventDone}}"><button wx:for="{{eventRoles}}" wx:key="role" data-role="{{item.role}}" bindtap="role" disabled="{{busy || item.taken}}">{{item.taken ? item.taken.name + '已接力' : item.label}}</button></view><view wx:else class="complete">故事已收进成长相册</view></view>
+  <view class="tree-row" wx:if="{{state}}"><view><view class="event-title">我们的树</view><view class="muted">{{treeCount}}/6 人今日接力 · 不同室友各照顾一次</view></view><button class="outline" bindtap="tree" disabled="{{busy || !state}}">接力照顾</button></view>
+  <view class="links"><view data-pane="flowers" bindtap="openPane">六盆花 ↗</view><view data-pane="memories" bindtap="openPane">成长相册 ↗</view><view data-pane="journal" bindtap="openPane">狗狗日记 ↗</view></view>
+  <view class="footnote">没人来时就晒晒太阳。不会饿死、枯萎，也不扣签到。</view>
+  <view class="drawer-mask" wx:if="{{pane}}" bindtap="closePane"><scroll-view scroll-y class="drawer" catchtap="noop">
+    <view class="drawer-head"><text>{{pane === 'flowers' ? '我们的六盆花' : (pane === 'memories' ? '成长相册' : '狗狗日记')}}</text><view bindtap="closePane">关闭</view></view>
+    <block wx:if="{{pane === 'flowers'}}"><view wx:for="{{flowers}}" wx:key="id" class="flower-row" data-id="{{item.id}}" bindtap="flower"><view><view>{{item.type}} · {{item.ownerName || '等人认领'}}</view><view class="muted">{{item.bloomed ? '已经开花，继续一起照顾' : '成长 ' + item.growth + '/6'}}</view></view><text>{{item.owner ? '浇水' : '认领'}} ›</text></view></block>
+    <block wx:if="{{pane === 'memories'}}"><view class="empty-pane" wx:if="{{!memories.length}}">第一次喂饭、第一朵花，都会留在这里。</view><view wx:for="{{memories}}" wx:key="id" class="memory"><view class="memory-mark">留念</view><text>{{item.text}}</text></view></block>
+    <block wx:if="{{pane === 'journal'}}"><view wx:for="{{journal}}" wx:key="day" class="journal"><view class="eyebrow">{{item.day}}</view><view>{{item.text}}</view></view></block>
+  </scroll-view></view>
+</view>

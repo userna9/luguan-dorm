@@ -4,7 +4,8 @@
     "pages/checkin/checkin",
     "pages/lottery/lottery",
     "pages/moments/moments",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/courtyard/courtyard"
   ],
   "window": {
     "backgroundTextStyle": "light",

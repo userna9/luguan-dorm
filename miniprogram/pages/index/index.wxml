@@ -36,6 +36,11 @@
     </view>
   </view>
 
+  <view class="courtyard-entry" bindtap="goToCourtyard" hover-class="entry-hover">
+    <view><view class="courtyard-kicker">六个人的小院</view><view class="courtyard-heading">养只狗，等一朵花开</view><view class="courtyard-caption">一起喂饭、养花，看看今天又闯了什么祸</view></view>
+    <view class="courtyard-enter">去小院 ↗</view>
+  </view>
+
   <!-- 入口 -->
   <view class="section-head"><text class="h">今天</text></view>
   <view class="sheet entries">

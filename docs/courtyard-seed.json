@@ -1,0 +1,73 @@
+{
+  "_id": "shared",
+  "version": 1,
+  "day": "2026-10-22",
+  "petName": "",
+  "proposals": [],
+  "votes": {},
+  "members": [],
+  "flowers": [
+    {
+      "id": 0,
+      "type": "雏菊",
+      "owner": "",
+      "ownerName": "",
+      "growth": 0,
+      "bloomed": false
+    },
+    {
+      "id": 1,
+      "type": "绣球",
+      "owner": "",
+      "ownerName": "",
+      "growth": 0,
+      "bloomed": false
+    },
+    {
+      "id": 2,
+      "type": "多肉",
+      "owner": "",
+      "ownerName": "",
+      "growth": 0,
+      "bloomed": false
+    },
+    {
+      "id": 3,
+      "type": "向日葵",
+      "owner": "",
+      "ownerName": "",
+      "growth": 0,
+      "bloomed": false
+    },
+    {
+      "id": 4,
+      "type": "郁金香",
+      "owner": "",
+      "ownerName": "",
+      "growth": 0,
+      "bloomed": false
+    },
+    {
+      "id": 5,
+      "type": "铃兰",
+      "owner": "",
+      "ownerName": "",
+      "growth": 0,
+      "bloomed": false
+    }
+  ],
+  "treeRounds": 0,
+  "memories": [],
+  "journal": [],
+  "counts": {
+    "feed": 0,
+    "play": 0,
+    "walk": 0
+  },
+  "people": {},
+  "watered": {},
+  "treePeople": [],
+  "eventPeople": [],
+  "eventDone": false,
+  "receipts": []
+}

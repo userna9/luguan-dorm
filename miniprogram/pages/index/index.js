@@ -508,6 +508,10 @@ Page({
     }
   },
 
+  goToCourtyard() {
+    wx.navigateTo({ url: '/pages/courtyard/courtyard' })
+  },
+
   goToCheckin() {
     if (!this.data.userInfo) {
       this.openProfileModal()
