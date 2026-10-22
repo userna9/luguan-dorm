@@ -1,102 +1,93 @@
 <view class="page-lottery">
-  <!-- 抽签主体 -->
-  <view class="lottery-hero">
-    <view class="hero-bg"></view>
-    <view class="hero-content">
-      <view class="lottery-title">鹿关抽签</view>
-      <view class="lottery-subtitle">{{todayDate}}</view>
+  <view class="intro">
+    <view class="intro-title serif">今天，鹿还是不鹿？</view>
+    <view class="intro-sub">{{todayDate}}，每人每天一签</view>
+  </view>
 
-      <view class="stick-box {{shakeClass}}" bindtap="onDraw">
-        <view class="stick-inner">
-          <view wx:if="{{!hasLottery && !drawing}}" class="stick-emoji">🎋</view>
-          <view wx:elif="{{drawing}}" class="drawing-text">抽签中…</view>
-          <view wx:elif="{{myResult === '鹿'}}" class="result-display deer">
-            <view class="result-emoji">🦌</view>
-            <view class="result-text">{{myResult}}</view>
-          </view>
-          <view wx:else class="result-display not-deer">
-            <view class="result-emoji">🍂</view>
-            <view class="result-text">{{myResult}}</view>
-          </view>
+  <!-- 签筒 / 签条 -->
+  <view class="altar">
+    <view class="draw-area" bindtap="onDraw">
+      <!-- 未抽或抽签中：签筒 -->
+      <view wx:if="{{!hasLottery || drawing}}" class="tube {{shakeClass}}">
+        <view class="stick s1"></view>
+        <view class="stick s2"></view>
+        <view class="stick s3"></view>
+        <view class="stick s4"></view>
+        <view class="stick s5"></view>
+        <view class="tube-body">
+          <view class="tube-rim"></view>
+          <view class="tube-label serif"><view>鹿</view><view>关</view></view>
         </view>
       </view>
 
-      <view class="lottery-cta">
-        <view wx:if="{{!hasLottery && !drawing}}" class="cta-text">点击上方签筒抽签</view>
-        <view wx:elif="{{drawing}}" class="cta-text">心中默念……</view>
-        <view wx:else class="cta-text done">今日签运：<text class="result-tag {{myResult === '鹿' ? 'tag-deer' : 'tag-not-deer'}}">{{myResult}}</text> · {{myLotteryTime}}</view>
+      <!-- 已抽：签条 -->
+      <view wx:else class="slip {{myResult === '鹿' ? 'deer' : 'leaf'}}">
+        <view class="slip-inner">
+          <view class="slip-head">今日</view>
+          <view class="slip-word serif" wx:if="{{myResult === '鹿'}}">鹿</view>
+          <view class="slip-word two serif" wx:else><view>不</view><view>鹿</view></view>
+          <view class="slip-time">{{myLotteryTime}}</view>
+        </view>
       </view>
+    </view>
+
+    <view class="cta">
+      <text wx:if="{{!hasLottery && !drawing}}">轻点签筒抽一支</text>
+      <text wx:elif="{{drawing}}" class="cta-wait">心中默念……</text>
+      <text wx:else>今天抽过了，明天再来</text>
     </view>
   </view>
 
-  <!-- 今日统计 -->
-  <view class="content">
-    <view class="card stats-card">
-      <view class="section-title">今日签运分布</view>
-      <view class="stats-grid">
-        <view class="stats-cell">
-          <view class="cell-num deer-color">{{deerCount}}</view>
-          <view class="cell-label">鹿</view>
-        </view>
-        <view class="stats-divider"></view>
-        <view class="stats-cell">
-          <view class="cell-num not-deer-color">{{notDeerCount}}</view>
-          <view class="cell-label">不鹿</view>
-        </view>
-        <view class="stats-divider"></view>
-        <view class="stats-cell">
-          <view class="cell-num">{{totalCount}}/6</view>
-          <view class="cell-label">已抽</view>
-        </view>
-      </view>
-      <view wx:if="{{totalCount > 0}}" class="bar-chart">
-        <view class="bar-segment deer-segment" style="width: {{deerPercent}}%"></view>
-        <view class="bar-segment not-deer-segment" style="width: {{notDeerPercent}}%"></view>
-      </view>
+  <!-- 今日分布 -->
+  <view class="section-head">
+    <text class="h">宿舍今日</text>
+    <text class="aside">已抽 {{totalCount}}/6</text>
+  </view>
+  <view class="sheet dist">
+    <view class="dist-bar">
+      <view wx:if="{{totalCount > 0}}" class="dist-seg deer" style="width: {{deerPercent}}%"></view>
+      <view wx:if="{{totalCount > 0}}" class="dist-seg leaf" style="width: {{notDeerPercent}}%"></view>
+    </view>
+    <view class="dist-legend">
+      <view class="legend"><view class="legend-key deer"></view>鹿<text class="legend-num serif">{{deerCount}}</text></view>
+      <view class="legend"><view class="legend-key leaf"></view>不鹿<text class="legend-num serif">{{notDeerCount}}</text></view>
+    </view>
+  </view>
+
+  <view class="seg tabs">
+    <view class="seg-item {{activeTab === 'today' ? 'active' : ''}}" data-tab="today" bindtap="switchTab">今日签单</view>
+    <view class="seg-item {{activeTab === 'history' ? 'active' : ''}}" data-tab="history" bindtap="switchTab">我的签</view>
+  </view>
+
+  <!-- 今日签单 -->
+  <view class="sheet list" wx:if="{{activeTab === 'today'}}">
+    <view wx:if="{{todayLotteryList.length === 0}}" class="empty">
+      <view class="empty-text">今天还没人抽签</view>
+      <view class="empty-tip">第一支签，留给你</view>
     </view>
 
-    <!-- Tab -->
-    <view class="tabs">
-      <view class="tab {{activeTab === 'today' ? 'active' : ''}}" data-tab="today" bindtap="switchTab">今日签单</view>
-      <view class="tab {{activeTab === 'history' ? 'active' : ''}}" data-tab="history" bindtap="switchTab">我的历史</view>
+    <view wx:for="{{todayLotteryList}}" wx:key="_id" class="row">
+      <image class="avatar-sm" src="{{item.avatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
+      <view class="row-body">
+        <view class="row-name">{{item.nickname}}</view>
+        <view class="row-time">{{item.time}}</view>
+      </view>
+      <view class="mark {{item.result === '鹿' ? 'mark-deer' : 'mark-leaf'}}">{{item.result}}</view>
+    </view>
+  </view>
+
+  <!-- 我的签 -->
+  <view class="sheet list" wx:if="{{activeTab === 'history'}}">
+    <view wx:if="{{history.length === 0}}" class="empty">
+      <view class="empty-text">还没有抽签记录</view>
     </view>
 
-    <!-- 今日签单 -->
-    <view class="card" wx:if="{{activeTab === 'today'}}">
-      <view wx:if="{{todayLotteryList.length === 0}}" class="empty">
-        <view class="empty-icon">🌙</view>
-        <view class="empty-text">今天还没人抽签</view>
-        <view class="empty-tip">做宿舍第一个签神！</view>
+    <view wx:for="{{history}}" wx:key="date" class="row history-row">
+      <view class="row-body">
+        <view class="row-name">{{item.date}}</view>
+        <view class="row-time">{{item.time}}</view>
       </view>
-
-      <view wx:for="{{todayLotteryList}}" wx:key="_id" class="lottery-item">
-        <image class="lottery-avatar" src="{{item.avatarUrl || 'images/profile.png'}}" mode="aspectFill"></image>
-        <view class="lottery-info">
-          <view class="lottery-name">{{item.nickname}}</view>
-          <view class="lottery-time">{{item.time}}</view>
-        </view>
-        <view class="lottery-result {{item.result === '鹿' ? 'deer' : 'not-deer'}}">
-          <text wx:if="{{item.result === '鹿'}}">🦌</text>
-          <text wx:else>🍂</text>
-          <text class="result-name">{{item.result}}</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- 我的历史 -->
-    <view class="card" wx:if="{{activeTab === 'history'}}">
-      <view wx:if="{{history.length === 0}}" class="empty">
-        <view class="empty-icon">📜</view>
-        <view class="empty-text">还没有抽签记录</view>
-      </view>
-
-      <view wx:for="{{history}}" wx:key="date" class="history-row">
-        <view class="history-date">{{item.date}}</view>
-        <view class="history-result {{item.result === '鹿' ? 'deer' : 'not-deer'}}">
-          {{item.result === '鹿' ? '🦌' : '🍂'}} {{item.result}}
-        </view>
-        <view class="history-time">{{item.time}}</view>
-      </view>
+      <view class="mark {{item.result === '鹿' ? 'mark-deer' : 'mark-leaf'}}">{{item.result}}</view>
     </view>
   </view>
 </view>
@@ -104,14 +95,15 @@
 <!-- 抽签结果弹层 -->
 <view class="result-mask {{showResult ? 'show' : ''}}" bindtap="closeResult">
   <view class="result-modal" catchtap="noop">
-    <view class="result-modal-content {{myResult === '鹿' ? 'deer-modal' : 'not-deer-modal'}}">
-      <view class="modal-emoji">{{myResult === '鹿' ? '🦌' : '🍂'}}</view>
-      <view class="modal-title">{{myResult === '鹿' ? '今日是鹿！' : '今日不鹿'}}</view>
-      <view class="modal-text">
-        {{myResult === '鹿' ? '愿你今日万事顺遂，喜乐常伴' : '保持平常心，明日更好'}}
+    <view class="slip big {{myResult === '鹿' ? 'deer' : 'leaf'}}">
+      <view class="slip-inner">
+        <view class="slip-head">今日</view>
+        <view class="slip-word serif" wx:if="{{myResult === '鹿'}}">鹿</view>
+        <view class="slip-word two serif" wx:else><view>不</view><view>鹿</view></view>
+        <view class="slip-time">{{myLotteryTime}}</view>
       </view>
-      <view class="modal-time">{{myLotteryTime}}</view>
-      <view class="modal-close">点击任意处关闭</view>
     </view>
+    <view class="result-text">{{myResult === '鹿' ? '愿你今日万事顺遂，喜乐常伴' : '保持平常心，明天再来'}}</view>
+    <view class="result-close" bindtap="closeResult">收下这支签</view>
   </view>
 </view>

@@ -2,20 +2,23 @@
 
   <!-- 发布入口 -->
   <view class="composer-bar">
-    <image class="composer-avatar" src="{{myAvatarUrl || 'images/profile.png'}}" mode="aspectFill"></image>
+    <image class="composer-avatar" src="{{myAvatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
     <view class="composer-trigger" bindtap="toggleComposer">
-      <text wx:if="{{!composing}}">分享宿舍动态…</text>
-      <text wx:else class="cancel-text" bindtap="closeComposer">收起编辑 ▲</text>
+      <text wx:if="{{!composing}}">说点宿舍里的事…</text>
+      <!-- catchtap：不让点击冒泡到 toggleComposer，否则刚收起又被打开 -->
+      <text wx:else class="cancel-text" catchtap="closeComposer">收起</text>
     </view>
-    <view class="composer-btn" bindtap="toggleComposer">✍️</view>
+    <view class="composer-btn {{composing ? 'open' : ''}}" bindtap="toggleComposer">
+      <image src="/images/ic-plus.png"></image>
+    </view>
   </view>
 
   <!-- 编辑面板 -->
   <view class="composer-panel" wx:if="{{composing}}">
-    <view class="panel-title">发布动态</view>
     <textarea
       class="content-input"
-      placeholder="这一刻的想法…（宿舍趣事、吐槽、美食打卡都行）"
+      placeholder="宿舍趣事、吐槽、今晚吃了啥…"
+      placeholder-style="color: #8aa095"
       value="{{content}}"
       bindinput="onContentInput"
       maxlength="500"
@@ -45,22 +48,19 @@
 
     <!-- 加载中 -->
     <view wx:if="{{loading}}" class="empty">
-      <view class="empty-icon">⏳</view>
-      <view class="empty-text">加载中…</view>
+      <view class="empty-text">正在加载动态…</view>
     </view>
 
     <!-- 空状态 -->
     <view wx:elif="{{posts.length === 0}}" class="empty empty-card">
-      <view class="empty-icon">🛋️</view>
       <view class="empty-text">还没有动态</view>
-      <view class="empty-tip">第一条宿舍动态由你来发！</view>
+      <view class="empty-tip">点右上角的 +，发第一条</view>
     </view>
 
-    <!-- 动态卡片 -->
+    <!-- 动态 -->
     <view class="post-card" wx:for="{{posts}}" wx:key="_id">
-      <!-- 头部：头像+昵称+时间+删除 -->
       <view class="post-header">
-        <image class="post-avatar" src="{{item.avatarUrl || 'images/profile.png'}}" mode="aspectFill"></image>
+        <image class="post-avatar" src="{{item.avatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
         <view class="post-meta">
           <view class="post-nickname">{{item.nickname}}</view>
           <view class="post-time">{{item.timeText}}</view>
@@ -68,11 +68,9 @@
         <view class="post-delete" wx:if="{{item.isMine}}" data-id="{{item._id}}" bindtap="onDeletePost">删除</view>
       </view>
 
-      <!-- 正文 -->
       <view class="post-content" wx:if="{{item.content}}">{{item.content}}</view>
 
-      <!-- 图片 -->
-      <view class="post-images images-{{item.images.length > 3 ? 'grid' : item.images.length}}"
+      <view class="post-images images-{{item.images.length === 4 ? 4 : (item.images.length > 3 ? 'grid' : item.images.length)}}"
             wx:if="{{item.images.length > 0}}">
         <view class="post-img-cell" wx:for="{{item.images}}" wx:for-item="img" wx:for-index="imgIdx" wx:key="*this">
           <image class="post-img" src="{{img}}" mode="aspectFill"
@@ -81,7 +79,17 @@
         </view>
       </view>
 
-      <!-- 评论区 -->
+      <view class="post-actions">
+        <view class="action-btn {{item.liked ? 'liked' : ''}}" data-id="{{item._id}}" bindtap="onToggleLike">
+          <image class="action-icon" src="{{item.liked ? '/images/ic-liked.png' : '/images/ic-like.png'}}"></image>
+          <text>{{item.likeCount > 0 ? item.likeCount : '喜欢'}}</text>
+        </view>
+        <view class="action-btn" data-id="{{item._id}}" bindtap="onShowCommentBox">
+          <image class="action-icon" src="/images/ic-comment.png"></image>
+          <text>{{item.commentCount > 0 ? item.commentCount : '评论'}}</text>
+        </view>
+      </view>
+
       <view class="comment-area" wx:if="{{item.comments.length > 0}}">
         <view class="comment-row" wx:for="{{item.comments}}" wx:for-item="c" wx:key="_id">
           <text class="comment-name">{{c.nickname}}：</text>
@@ -92,21 +100,8 @@
         </view>
       </view>
 
-      <!-- 操作条 -->
-      <view class="post-actions">
-        <view class="action-btn {{item.liked ? 'liked' : ''}}" data-id="{{item._id}}" bindtap="onToggleLike">
-          <text class="action-icon">{{item.liked ? '❤️' : '🤍'}}</text>
-          <text>{{item.likeCount > 0 ? item.likeCount : '赞'}}</text>
-        </view>
-        <view class="action-btn" data-id="{{item._id}}" bindtap="onShowCommentBox">
-          <text class="action-icon">💬</text>
-          <text>{{item.commentCount > 0 ? item.commentCount : '评论'}}</text>
-        </view>
-      </view>
-
-      <!-- 评论输入区 -->
+      <!-- 评论输入 -->
       <view class="comment-compose" wx:if="{{commentFor === item._id}}">
-        <!-- 已选图片预览 -->
         <view class="comment-picked" wx:if="{{commentImage}}">
           <image class="comment-picked-img" src="{{commentImage}}" mode="aspectFill"
                  bindtap="onPreviewPickedImage"></image>
@@ -114,10 +109,15 @@
         </view>
 
         <view class="comment-input-row">
-          <view class="comment-tool {{emojiOpen ? 'active' : ''}}" bindtap="onToggleEmoji">😊</view>
-          <view class="comment-tool" bindtap="onPickCommentImage">🖼️</view>
+          <view class="comment-tool {{emojiOpen ? 'active' : ''}}" bindtap="onToggleEmoji">
+            <image src="/images/ic-smile.png"></image>
+          </view>
+          <view class="comment-tool" bindtap="onPickCommentImage">
+            <image src="/images/ic-image.png"></image>
+          </view>
           <input class="comment-input"
-                 placeholder="友善评论，快乐宿舍…"
+                 placeholder="说点什么"
+                 placeholder-style="color: #8aa095"
                  value="{{commentText}}"
                  maxlength="200"
                  bindinput="onCommentInput"
@@ -128,7 +128,6 @@
           <view class="comment-cancel" bindtap="onCancelComment">取消</view>
         </view>
 
-        <!-- 表情面板 -->
         <view class="emoji-panel" wx:if="{{emojiOpen}}">
           <view class="emoji-item" wx:for="{{emojiList}}" wx:key="*this"
                 data-emoji="{{item}}" bindtap="onPickEmoji">{{item}}</view>
@@ -137,7 +136,6 @@
     </view>
   </view>
 
-  <view class="feed-end" wx:if="{{posts.length > 0}}">
-    🦌 没有更多动态了
-  </view>
+  <view class="feed-end" wx:if="{{loadingMore}}">正在加载更早的动态…</view>
+  <view class="feed-end" wx:elif="{{posts.length > 0 && noMore}}">没有更早的动态了</view>
 </view>

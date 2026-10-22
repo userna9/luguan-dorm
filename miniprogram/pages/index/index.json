@@ -1,7 +1,6 @@
 {
   "navigationBarTitleText": "乱世诸雄",
   "enablePullDownRefresh": true,
-  "backgroundColor": "#f7f5fb",
-  "backgroundTextStyle": "light",
-  "navigationBarBackgroundColor": "#7e57c2"
+  "backgroundColor": "#e4ece2",
+  "backgroundTextStyle": "dark"
 }

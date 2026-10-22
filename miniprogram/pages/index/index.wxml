@@ -1,128 +1,133 @@
 <view class="page-index">
-  <!-- 顶部问候卡片 -->
-  <view class="header">
-    <view class="header-bg"></view>
-    <view class="header-content">
-      <view class="user-row">
-        <view class="user-info" bindtap="goToProfile">
-          <image class="avatar" src="{{avatarUrl || 'images/profile.png'}}" mode="aspectFill"></image>
-          <view class="user-text">
-            <view class="greeting">{{greeting}}，{{nickname || '宿舍小伙伴'}}</view>
-            <view class="date">{{dateStr}}</view>
-          </view>
+  <!-- 问候 -->
+  <view class="greet" bindtap="goToProfile">
+    <view class="greet-text">
+      <view class="greet-hello serif">{{greeting}}，</view>
+      <view class="greet-name serif">{{nickname || '室友'}}</view>
+      <view class="greet-date">{{dateStr}}</view>
+    </view>
+    <image class="greet-avatar" src="{{avatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
+  </view>
+
+  <!-- 宿舍楼：六扇窗。到宿舍的人亮灯，登记了还没到的窗口留一圈暖光等着 -->
+  <view class="building" bindtap="goToCheckin">
+    <view class="canopy">
+      <view class="tree t1"></view>
+      <view class="tree t2"></view>
+      <view class="tree t3"></view>
+      <view class="tree t4"></view>
+      <view class="tree t5"></view>
+    </view>
+    <view class="facade">
+      <view class="windows">
+        <view wx:for="{{[0, 1, 2, 3, 4, 5]}}" wx:key="*this"
+              class="window {{index < arrivedCount ? 'lit' : (index < checkedInCount ? 'expect' : '')}}"
+              style="animation-delay: {{0.25 + index * 0.16}}s">
+          <view class="glow"></view>
+          <view class="pane"></view>
         </view>
       </view>
-      <view class="stats-row">
-        <view class="stat-item">
-          <view class="stat-num">{{checkedInCount}}/{{totalMembers}}</view>
-          <view class="stat-label">已回宿舍</view>
+      <view class="facade-foot">
+        <view class="facade-line serif">
+          {{arrivedCount >= totalMembers ? '六盏灯都亮了' : (arrivedCount > 0 ? '亮了 ' + arrivedCount + ' 盏灯' : (checkedInCount > 0 ? '灯还没亮，有人在路上' : '今晚还没有灯亮起'))}}
         </view>
-        <view class="stat-divider"></view>
-        <view class="stat-item">
-          <view class="stat-num">{{lotteryCount}}/{{totalMembers}}</view>
-          <view class="stat-label">已抽签</view>
-        </view>
+        <view class="facade-sub">已登记 {{checkedInCount}}/{{totalMembers}}，已抽签 {{lotteryCount}}/{{totalMembers}}</view>
       </view>
     </view>
   </view>
 
-  <!-- 功能卡片区 -->
-  <view class="cards">
-    <view class="feature-card checkin-card" bindtap="goToCheckin">
-      <view class="card-icon checkin-icon">🏠</view>
-      <view class="card-content">
-        <view class="card-title">回寝登记</view>
-        <view class="card-desc">
-          {{isCheckedInToday ? '今日已登记预计回寝' : '登记你预计回宿舍的时间'}}
-        </view>
+  <!-- 入口 -->
+  <view class="section-head"><text class="h">今天</text></view>
+  <view class="sheet entries">
+    <view class="entry" bindtap="goToCheckin" hover-class="entry-hover">
+      <image class="entry-icon" src="/images/ic-checkin.png"></image>
+      <view class="entry-body">
+        <view class="entry-title">回寝登记</view>
+        <view class="entry-desc">{{isCheckedInToday ? '今天已登记，可以随时改' : '告诉大家你今晚几点回'}}</view>
       </view>
-      <view class="card-arrow">›</view>
+      <view class="entry-dot" wx:if="{{!isCheckedInToday}}"></view>
+      <view class="chev"></view>
     </view>
 
-    <view class="feature-card meal-card" bindtap="openMealModal">
-      <view class="card-icon meal-icon">🍚</view>
-      <view class="card-content">
-        <view class="card-title">吃饭询问</view>
-        <view class="card-desc">{{mealCardDesc}}</view>
+    <view class="entry" bindtap="openMealModal" hover-class="entry-hover">
+      <image class="entry-icon" src="/images/ic-meal.png"></image>
+      <view class="entry-body">
+        <view class="entry-title">吃饭询问</view>
+        <view class="entry-desc">{{mealCardDesc}}</view>
       </view>
-      <view class="card-arrow">›</view>
+      <view class="chev"></view>
     </view>
 
-    <view class="feature-card lottery-card" bindtap="goToLottery">
-      <view class="card-icon lottery-icon">🎋</view>
-      <view class="card-content">
-        <view class="card-title">鹿关抽签</view>
-        <view class="card-desc">
-          {{hasLotteryToday ? '今日已抽签' : '每日一签，看看今日运势'}}
-        </view>
+    <view class="entry" bindtap="goToLottery" hover-class="entry-hover">
+      <image class="entry-icon" src="/images/ic-lottery.png"></image>
+      <view class="entry-body">
+        <view class="entry-title">鹿关抽签</view>
+        <view class="entry-desc">{{hasLotteryToday ? '今天已抽过签' : '每日一签，鹿还是不鹿'}}</view>
       </view>
-      <view class="card-arrow">›</view>
+      <view class="entry-dot" wx:if="{{!hasLotteryToday}}"></view>
+      <view class="chev"></view>
     </view>
 
-    <view class="feature-card moments-card" bindtap="goToMoments">
-      <view class="card-icon moments-icon">🛋️</view>
-      <view class="card-content">
-        <view class="card-title">宿舍空间</view>
-        <view class="card-desc">发动态、晒照片，记录宿舍日常</view>
+    <view class="entry" bindtap="goToMoments" hover-class="entry-hover">
+      <image class="entry-icon" src="/images/ic-moments.png"></image>
+      <view class="entry-body">
+        <view class="entry-title">宿舍空间</view>
+        <view class="entry-desc">发动态、晒照片，记下宿舍日常</view>
       </view>
-      <view class="card-arrow">›</view>
+      <view class="chev"></view>
     </view>
   </view>
 
-  <!-- 今日速览 -->
-  <view class="card">
-    <view class="section-title">今日宿舍速览</view>
-    <view class="overview-row">
-      <view class="overview-label">📍 最晚预计回寝</view>
-      <view class="overview-value" wx:if="{{latestCheckin}}">
-        <text class="overview-name">{{latestCheckin.nickname}}</text>
-        <text class="overview-time">{{latestCheckinTimeText}}</text>
+  <!-- 今晚速览 -->
+  <view class="section-head"><text class="h">今晚</text></view>
+  <view class="sheet tonight">
+    <view class="fact">
+      <view class="fact-label">最晚回来</view>
+      <view class="fact-value" wx:if="{{latestCheckin}}">
+        <text class="fact-name">{{latestCheckin.nickname}}</text>
+        <text class="fact-time serif">{{latestCheckinTimeText}}</text>
       </view>
-      <view class="overview-empty" wx:else>还没人登记</view>
+      <view class="fact-empty" wx:else>还没人登记</view>
     </view>
-    <view class="overview-row" wx:if="{{latestLottery}}">
-      <view class="overview-label">🎯 最近抽签</view>
-      <view class="overview-value">
-        <text class="overview-name">{{latestLottery.nickname}}</text>
-        <text class="overview-result {{latestLottery.result === '鹿' ? 'result-deer' : 'result-not-deer'}}">{{latestLottery.result}}</text>
+    <view class="fact">
+      <view class="fact-label">最近抽签</view>
+      <view class="fact-value" wx:if="{{latestLottery}}">
+        <text class="fact-name">{{latestLottery.nickname}}</text>
+        <text class="mark {{latestLottery.result === '鹿' ? 'mark-deer' : 'mark-leaf'}}">{{latestLottery.result}}</text>
       </view>
+      <view class="fact-empty" wx:else>还没人抽签</view>
     </view>
   </view>
 
-  <!-- 提示信息 -->
-  <view class="tip">
-    🦌 鹿关抽签：每日一签，看看今日是「鹿」还是「不鹿」
-  </view>
+  <view class="colophon">六个人，一间屋</view>
 </view>
 
-<!-- 吃饭询问弹窗 -->
-<view class="modal-mask" wx:if="{{showMealModal}}" bindtap="closeMealModal">
+<!-- 吃饭询问（底部抽屉） -->
+<view class="modal-mask as-sheet" wx:if="{{showMealModal}}" bindtap="closeMealModal">
   <view class="modal-card meal-modal" catchtap="noop">
-    <view class="modal-title">🍚 吃饭询问</view>
-    <view class="modal-subtitle">发起后全宿舍都能在这里作答</view>
+    <view class="grabber"></view>
+    <view class="modal-title">吃饭询问</view>
+    <view class="modal-subtitle">发起后，全宿舍都能在这里选</view>
 
-    <view class="meal-tabs">
-      <view class="meal-tab {{mealTab === '中午' ? 'active' : ''}}" data-tab="中午" bindtap="switchMealTab">中午吃什么</view>
-      <view class="meal-tab {{mealTab === '下午' ? 'active' : ''}}" data-tab="下午" bindtap="switchMealTab">下午吃什么</view>
+    <view class="seg">
+      <view class="seg-item {{mealTab === '中午' ? 'active' : ''}}" data-tab="中午" bindtap="switchMealTab">中午吃什么</view>
+      <view class="seg-item {{mealTab === '下午' ? 'active' : ''}}" data-tab="下午" bindtap="switchMealTab">下午吃什么</view>
     </view>
 
     <!-- 中午 -->
     <block wx:if="{{mealTab === '中午'}}">
       <view wx:if="{{mealAskLunch}}" class="meal-body">
-        <view class="meal-creator">{{mealAskLunch.creator}} 发起了询问 · {{mealAskLunch.answerCount}}人已作答</view>
+        <view class="meal-creator">{{mealAskLunch.creator}} 发起，{{mealAskLunch.answerCount}} 人已选</view>
         <view wx:for="{{mealAskLunch.options}}" wx:key="label"
               class="meal-option {{item.isMine ? 'mine' : ''}}"
               data-choice="{{item.label}}" bindtap="onChooseMealOption">
           <view class="meal-option-label">{{item.label}}</view>
-          <view class="meal-option-count" wx:if="{{item.count > 0}}">{{item.count}}人</view>
-          <view class="meal-option-check" wx:if="{{item.isMine}}">✓ 我</view>
-        </view>
-        <view wx:for="{{mealAskLunch.options}}" wx:key="label" wx:if="{{item.votersText}}" class="meal-voters">
-          <text class="meal-voters-label">{{item.label}}：</text>{{item.votersText}}
+          <view class="meal-option-voters" wx:if="{{item.votersText}}">{{item.votersText}}</view>
+          <view class="meal-option-count" wx:if="{{item.count > 0}}">{{item.count}}</view>
         </view>
       </view>
       <view wx:else class="meal-empty">
-        <view class="meal-empty-text">今天还没人发起中午的询问</view>
+        <view class="meal-empty-text">今天还没人问中午吃什么</view>
         <button class="btn-primary" bindtap="onCreateMealAsk">发起询问</button>
       </view>
     </block>
@@ -130,20 +135,17 @@
     <!-- 下午 -->
     <block wx:if="{{mealTab === '下午'}}">
       <view wx:if="{{mealAskDinner}}" class="meal-body">
-        <view class="meal-creator">{{mealAskDinner.creator}} 发起了询问 · {{mealAskDinner.answerCount}}人已作答</view>
+        <view class="meal-creator">{{mealAskDinner.creator}} 发起，{{mealAskDinner.answerCount}} 人已选</view>
         <view wx:for="{{mealAskDinner.options}}" wx:key="label"
               class="meal-option {{item.isMine ? 'mine' : ''}}"
               data-choice="{{item.label}}" bindtap="onChooseMealOption">
           <view class="meal-option-label">{{item.label}}</view>
-          <view class="meal-option-count" wx:if="{{item.count > 0}}">{{item.count}}人</view>
-          <view class="meal-option-check" wx:if="{{item.isMine}}">✓ 我</view>
-        </view>
-        <view wx:for="{{mealAskDinner.options}}" wx:key="label" wx:if="{{item.votersText}}" class="meal-voters">
-          <text class="meal-voters-label">{{item.label}}：</text>{{item.votersText}}
+          <view class="meal-option-voters" wx:if="{{item.votersText}}">{{item.votersText}}</view>
+          <view class="meal-option-count" wx:if="{{item.count > 0}}">{{item.count}}</view>
         </view>
       </view>
       <view wx:else class="meal-empty">
-        <view class="meal-empty-text">今天还没人发起下午的询问</view>
+        <view class="meal-empty-text">今天还没人问下午吃什么</view>
         <button class="btn-primary" bindtap="onCreateMealAsk">发起询问</button>
       </view>
     </block>
@@ -156,15 +158,15 @@
       </button>
     </view>
     <!-- 小程序未认证时微信会禁用转发，这里给一个不依赖认证的兜底 -->
-    <view class="meal-copy-link" bindtap="onCopyMealText">转发不了？点这里复制提醒文字</view>
+    <view class="meal-copy-link" bindtap="onCopyMealText">转发不了？复制提醒文字</view>
   </view>
 </view>
 
 <!-- 引导设置昵称弹窗 -->
 <view class="modal-mask {{keyboardUp ? 'keyboard-up' : ''}}" wx:if="{{showProfileModal}}" bindtap="closeProfileModal">
   <view class="modal-card" catchtap="noop">
-    <view class="modal-title">欢迎来到鹿关宿舍</view>
-    <view class="modal-subtitle">设置你的昵称和头像，让大家认识你</view>
+    <view class="modal-title">欢迎回到鹿关</view>
+    <view class="modal-subtitle">设个昵称和头像，室友才认得出你</view>
 
     <view class="form-item">
       <view class="form-label">头像</view>
@@ -174,7 +176,7 @@
           <view class="avatar-placeholder" wx:else>+</view>
         </button>
         <view class="avatar-side">
-          <view class="avatar-tip">点圆形选微信头像</view>
+          <view class="avatar-tip">点圆形，用微信头像</view>
           <view class="avatar-album-link" bindtap="onPickAvatarFromAlbum">从相册选择</view>
         </view>
       </view>
@@ -185,7 +187,7 @@
       <input
         class="nickname-input"
         type="text"
-        placeholder="点击输入你的昵称"
+        placeholder="室友平时怎么叫你"
         value="{{nicknameInitial}}"
         maxlength="20"
         adjust-position="{{false}}"

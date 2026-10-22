@@ -4,6 +4,7 @@ const db = wx.cloud.database()
 const _ = db.command
 const { uploadImage, toDisplayUrl, checkUrls } = require('../../utils/oss.js')
 const { getAvatarMap, pickAvatar } = require('../../utils/users.js')
+const { fetchAll } = require('../../utils/fetchAll.js')
 
 // 评论可用的表情（内置，不依赖任何外部服务）
 const EMOJIS = [
@@ -14,6 +15,7 @@ const EMOJIS = [
   '🦌', '🍚', '🍜', '🍗', '🍺', '🎉', '❤️', '🔥', '✨', '🌙',
 ]
 const COMMENT_MAX = 200
+const PAGE_SIZE = 10 // 每次加载的动态条数
 
 Page({
   data: {
@@ -31,6 +33,8 @@ Page({
     emojiList: EMOJIS,
     emojiOpen: false,      // 表情面板是否展开
     loading: true,
+    loadingMore: false,    // 正在加载更早的动态
+    noMore: false,         // 已经到最早一条了
   },
 
   onLoad() {
@@ -40,6 +44,11 @@ Page({
   onShow() {
     // 强制刷新头像映射：刚在"我的"里换过头像，切回来要立刻生效
     this.loadMyInfo().then(() => this.loadPosts(true))
+  },
+
+  // 滑到底：加载更早的动态
+  onReachBottom() {
+    this.loadMorePosts()
   },
 
   onPullDownRefresh() {
@@ -185,54 +194,84 @@ Page({
 
   // ============ 动态列表 ============
 
+  // 首屏：拉第一页，替换整个列表
   async loadPosts(force) {
     try {
-      const res = await db.collection('moments')
-        .orderBy('createdAt', 'desc')
-        .limit(20)
-        .get()
-      const posts = res.data || []
-      const openid = app.globalData.openid
-      // 头像以 users 集合为准，避免历史快照为空/过期导致头像永远不显示
-      const avatarMap = await getAvatarMap(force)
-
-      // 拉这些动态的评论（一次 in 查询，避免 N+1）
-      let commentsMap = {}
-      if (posts.length > 0) {
-        const ids = posts.map(p => p._id)
-        const cRes = await db.collection('comments')
-          .where({ momentId: _.in(ids) })
-          .orderBy('createdAt', 'asc')
-          .limit(200)
-          .get()
-        for (const c of (cRes.data || [])) {
-          if (!commentsMap[c.momentId]) commentsMap[c.momentId] = []
-          commentsMap[c.momentId].push({
-            ...c,
-            timeText: this.formatRelative(c.createdAt),
-            avatarUrl: pickAvatar(avatarMap, c._openid, c.avatarUrl),
-          })
-        }
-      }
-
-      const formatted = posts.map(p => ({
-        ...p,
-        timeText: this.formatRelative(p.createdAt),
-        likeCount: (p.likes || []).length,
-        liked: (p.likes || []).indexOf(openid) !== -1,
-        isMine: p._openid === openid,
-        avatarUrl: pickAvatar(avatarMap, p._openid, p.avatarUrl),
-        // 旧云存储的图片在免费环境下读不了，直接过滤掉，避免出现裂图
-        images: (p.images || []).filter(u => toDisplayUrl(u)),
-        comments: commentsMap[p._id] || [],
-        commentCount: (commentsMap[p._id] || []).length,
-      }))
-
-      this.setData({ posts: formatted, loading: false })
+      const formatted = await this.fetchPostsPage(0, force)
+      this.setData({
+        posts: formatted,
+        loading: false,
+        noMore: formatted.length < PAGE_SIZE,
+      })
     } catch (e) {
       console.error('loadPosts error', e)
       this.setData({ loading: false })
     }
+  },
+
+  // 滑到底：接着拉更早的一页，追加到列表后面
+  async loadMorePosts() {
+    const { loading, loadingMore, noMore, posts } = this.data
+    if (loading || loadingMore || noMore) return
+    this.setData({ loadingMore: true })
+    try {
+      const more = await this.fetchPostsPage(posts.length)
+      // 去重：翻页期间有人发了新动态，skip 会让上一页的最后一条再出现一次
+      const seen = new Set(posts.map(p => p._id))
+      this.setData({
+        posts: posts.concat(more.filter(p => !seen.has(p._id))),
+        noMore: more.length < PAGE_SIZE,
+      })
+    } catch (e) {
+      console.error('loadMorePosts error', e)
+    } finally {
+      this.setData({ loadingMore: false })
+    }
+  },
+
+  /** 拉一页动态（含评论、头像），返回页面展示结构 */
+  async fetchPostsPage(skip, force) {
+    const res = await db.collection('moments')
+      .orderBy('createdAt', 'desc')
+      .skip(skip)
+      .limit(PAGE_SIZE)
+      .get()
+    const posts = res.data || []
+    const openid = app.globalData.openid
+    // 头像以 users 集合为准，避免历史快照为空/过期导致头像永远不显示
+    const avatarMap = await getAvatarMap(force)
+
+    // 拉这些动态的评论（一次 in 查询，避免 N+1；前端单次最多 20 条，所以分页拉全）
+    let commentsMap = {}
+    if (posts.length > 0) {
+      const ids = posts.map(p => p._id)
+      const comments = await fetchAll(
+        db.collection('comments').where({ momentId: _.in(ids) }),
+        'createdAt', 'asc'
+      )
+      for (const c of comments) {
+        if (!commentsMap[c.momentId]) commentsMap[c.momentId] = []
+        commentsMap[c.momentId].push({
+          ...c,
+          timeText: this.formatRelative(c.createdAt),
+          avatarUrl: pickAvatar(avatarMap, c._openid, c.avatarUrl),
+        })
+      }
+    }
+
+    const formatted = posts.map(p => ({
+      ...p,
+      timeText: this.formatRelative(p.createdAt),
+      likeCount: (p.likes || []).length,
+      liked: (p.likes || []).indexOf(openid) !== -1,
+      isMine: p._openid === openid,
+      avatarUrl: pickAvatar(avatarMap, p._openid, p.avatarUrl),
+      // 旧云存储的图片在免费环境下读不了，直接过滤掉，避免出现裂图
+      images: (p.images || []).filter(u => toDisplayUrl(u)),
+      comments: commentsMap[p._id] || [],
+      commentCount: (commentsMap[p._id] || []).length,
+    }))
+    return formatted
   },
 
   // ============ 点赞 / 评论 / 删除 ============

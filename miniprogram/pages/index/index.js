@@ -4,6 +4,7 @@ const db = wx.cloud.database()
 const { isTempFile, uploadAvatar } = require('../../utils/upload.js')
 const { toDisplayUrl, checkUrls, isPermanentUrl } = require('../../utils/oss.js')
 const { isConfigured, isAlwaysAllowed, requestMealSubscribe } = require('../../utils/subscribe.js')
+const { dormToday, formatDate, nightMinutes } = require('../../utils/dorm.js')
 
 const MEAL_OPTIONS = ['不知道', '泡面', '已经点了外卖', '南门', '食堂']
 
@@ -11,7 +12,8 @@ Page({
   data: {
     greeting: '',
     todayDate: '',
-    checkedInCount: 0,
+    checkedInCount: 0, // 今晚登记了预计回寝时间的人数
+    arrivedCount: 0, // 其中已经点了「我到宿舍了」的人数
     totalMembers: 6,
     lotteryCount: 0,
     isCheckedInToday: false,
@@ -38,11 +40,12 @@ Page({
   onLoad(query) {
     // 从分享卡片进来时，自动打开吃饭询问
     this.autoOpenMeal = !!(query && query.openMeal === '1')
-    this.refreshGreeting()
-    this.loadUserInfo()
+    // 数据在 onShow 里加载（onLoad 之后一定会触发 onShow，这里再加载会重复请求）
   },
 
   onShow() {
+    // 每次显示都重算日期：小程序可能从昨晚一直挂到今天
+    this.refreshGreeting()
     // loadUserInfo 内部会加载今日统计
     this.loadUserInfo()
     // 刷新"是否勾了总是保持"的缓存，供静默补额度使用
@@ -84,23 +87,17 @@ Page({
     else if (hour < 22) greeting = '晚上好'
     else greeting = '夜深了'
 
-    const today = new Date()
-    const dateStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`
+    // 按「宿舍日」算：凌晨 5 点前仍是前一天的晚上
+    const today = dormToday()
+    const dateStr = `${today.getMonth() + 1}月${today.getDate()}日`
     const weekday = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][today.getDay()]
-    const todayDate = this.formatDate(today)
+    const todayDate = formatDate(today)
 
     this.setData({
       greeting,
       dateStr: `${dateStr} ${weekday}`,
       todayDate,
     })
-  },
-
-  formatDate(d) {
-    const y = d.getFullYear()
-    const m = String(d.getMonth() + 1).padStart(2, '0')
-    const day = String(d.getDate()).padStart(2, '0')
-    return `${y}-${m}-${day}`
   },
 
   async loadUserInfo() {
@@ -171,10 +168,11 @@ Page({
       const lottery = lotteryRes.data || []
       const hasLotteryToday = lottery.some(l => l._openid === openid)
 
-      // 找出最晚的预计回寝
+      // 找出最晚的预计回寝（00:40 要比 23:30 晚，用 nightMinutes 比较）
       const latestCheckin = checkins.length > 0
-        ? checkins.reduce((a, b) => (a.hour * 60 + a.minute > b.hour * 60 + b.minute ? a : b))
+        ? checkins.reduce((a, b) => (nightMinutes(a.hour, a.minute) > nightMinutes(b.hour, b.minute) ? a : b))
         : null
+      const arrivedCount = checkins.filter(c => c.arrivedAt).length
 
       // 计算时间字符串
       let latestCheckinTimeText = ''
@@ -197,7 +195,7 @@ Page({
         mealAskDinner = dinner ? this.buildMealDisplay(dinner, openid) : null
         const active = mealAskLunch || mealAskDinner
         if (active) {
-          mealCardDesc = `${active.mealType}询问进行中 · ${active.answerCount}人已作答`
+          mealCardDesc = `${active.mealType}的询问进行中，${active.answerCount} 人已选`
         }
       } catch (e) {
         console.error('loadMealAsks error', e)
@@ -205,6 +203,7 @@ Page({
 
       this.setData({
         checkedInCount: checkins.length,
+        arrivedCount,
         lotteryCount: lottery.length,
         isCheckedInToday,
         hasLotteryToday,

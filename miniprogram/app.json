@@ -8,15 +8,15 @@
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#7e57c2",
+    "navigationBarBackgroundColor": "#e4ece2",
     "navigationBarTitleText": "乱世诸雄",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#f7f5fb"
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#e4ece2"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#7e57c2",
-    "backgroundColor": "#ffffff",
+    "color": "#7fa88b",
+    "selectedColor": "#2f6b52",
+    "backgroundColor": "#f6f9f3",
     "borderStyle": "white",
     "list": [
       {

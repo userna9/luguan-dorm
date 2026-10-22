@@ -3,6 +3,8 @@ const app = getApp()
 const db = wx.cloud.database()
 const { isTempFile, uploadAvatar } = require('../../utils/upload.js')
 const { toDisplayUrl, checkUrls, isPermanentUrl } = require('../../utils/oss.js')
+const { fetchAll } = require('../../utils/fetchAll.js')
+const { dormToday, formatDate } = require('../../utils/dorm.js')
 
 Page({
   data: {
@@ -23,11 +25,8 @@ Page({
     nicknameInitial: '', // 打开弹窗时的昵称，只用于初始化输入框（避免输入被 setData 打断）
   },
 
-  onLoad() {
-    this.loadProfile()
-  },
-
   onShow() {
+    // onLoad 之后一定会触发 onShow，只在这里加载，避免启动时重复请求
     this.loadProfile()
   },
 
@@ -64,20 +63,13 @@ Page({
         }
       }
 
-      // 统计打卡
-      const allCheckinsRes = await db.collection('checkins')
-        .where({ _openid: openid })
-        .orderBy('date', 'desc')
-        .limit(1000)
-        .get()
-      const checkins = allCheckinsRes.data || []
+      // 统计登记、抽签：前端 get() 一次最多 20 条，要分页拉全，否则用满 20 天后数字就不涨了
+      const [checkins, lottery] = await Promise.all([
+        fetchAll(db.collection('checkins').where({ _openid: openid }), 'date', 'desc'),
+        fetchAll(db.collection('lottery').where({ _openid: openid }), 'date', 'desc'),
+      ])
       this.calculateCheckinStats(checkins)
 
-      // 统计抽签
-      const allLotteryRes = await db.collection('lottery')
-        .where({ _openid: openid })
-        .get()
-      const lottery = allLotteryRes.data || []
       const deerCount = lottery.filter(l => l.result === '鹿').length
       const notDeerCount = lottery.length - deerCount
       const deerRate = lottery.length > 0 ? Math.round((deerCount * 100) / lottery.length) : 0
@@ -111,10 +103,11 @@ Page({
     const dates = checkins.map(c => c.date).sort()
     const dateSet = new Set(dates)
 
-    // 当前连续：从今天往前
+    // 当前连续：从今天往前（按宿舍日）。今晚还没登记不算断，从昨天开始数
     let currentStreak = 0
-    const today = new Date()
+    const today = dormToday()
     const cursor = new Date(today)
+    if (!dateSet.has(formatDate(cursor))) cursor.setDate(cursor.getDate() - 1)
     while (dateSet.has(this.formatDate(cursor))) {
       currentStreak++
       cursor.setDate(cursor.getDate() - 1)

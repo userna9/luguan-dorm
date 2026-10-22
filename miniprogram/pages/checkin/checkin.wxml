@@ -1,95 +1,73 @@
 <view class="page-checkin">
-  <!-- 预计回寝时间登记 -->
-  <view class="checkin-hero">
-    <view class="hero-bg"></view>
-    <view class="hero-content">
-      <view class="current-time">{{currentTime}}</view>
-      <view class="checkin-date">{{todayDate}}</view>
+  <!-- 预计回寝时间：时间选择器包住整张卡片，选完自动保存 -->
+  <view class="now">现在 <text class="now-time">{{currentTime}}</text></view>
 
-      <!-- 时间选择器包住大按钮：点按钮弹出选时间，选完自动保存 -->
-      <picker mode="time" value="{{expectedTime}}" bindchange="onExpectedTimeChange">
-        <view class="big-check-btn {{isCheckedIn ? 'checked' : ''}}">
-          <view wx:if="{{!isCheckedIn}}" class="big-check-icon">🏠</view>
-          <view wx:else class="big-check-icon">🕐</view>
-          <view class="big-check-text">{{isCheckedIn ? '我的预计回寝' : '预计回寝时间'}}</view>
-          <view class="big-check-time">{{expectedTime}}</view>
-          <view class="big-check-tip">{{isCheckedIn ? '点击可修改' : '点击选择时间'}}</view>
-        </view>
-      </picker>
+  <picker mode="time" value="{{expectedTime}}" bindchange="onExpectedTimeChange">
+    <view class="time-card {{isCheckedIn ? 'set' : ''}}">
+      <view class="time-q">{{isCheckedIn ? '我今晚预计' : '今晚几点回宿舍？'}}</view>
+      <view class="time-big serif">{{expectedTime}}</view>
+      <view class="time-foot">
+        <view class="time-lamp"></view>
+        <text>{{isCheckedIn ? '已登记，室友都能看到。点一下可以改' : '点一下选时间，选好就自动登记'}}</text>
+      </view>
+    </view>
+  </picker>
 
-      <view class="checkin-status" wx:if="{{isCheckedIn}}">
-        🦌 已登记！全宿舍都能看到你的预计回寝时间
-      </view>
-      <view class="checkin-status hint" wx:else>
-        选择你预计回宿舍的时间，公开给全宿舍
-      </view>
+  <!-- 到宿舍了：点亮首页上自己的那扇窗 -->
+  <view class="arrive {{myArrivedText ? 'done' : ''}}" bindtap="onArrive" hover-class="arrive-hover">
+    <view class="arrive-window"></view>
+    <view class="arrive-text">
+      <view class="arrive-title">{{myArrivedText ? '已到宿舍' : '我到宿舍了'}}</view>
+      <view class="arrive-sub">{{myArrivedText ? myArrivedText + ' 到的，点一下可撤销' : '点一下，首页上你的窗就会亮'}}</view>
     </view>
   </view>
 
-  <!-- Tab 切换 -->
-  <view class="tabs">
-    <view class="tab {{activeTab === 'today' ? 'active' : ''}}" data-tab="today" bindtap="switchTab">今日排行</view>
-    <view class="tab {{activeTab === 'history' ? 'active' : ''}}" data-tab="history" bindtap="switchTab">我的记录</view>
+  <view class="seg tabs">
+    <view class="seg-item {{activeTab === 'today' ? 'active' : ''}}" data-tab="today" bindtap="switchTab">回寝顺序</view>
+    <view class="seg-item {{activeTab === 'history' ? 'active' : ''}}" data-tab="history" bindtap="switchTab">我的 7 天</view>
   </view>
 
-  <!-- 今日排行 -->
-  <view class="content" wx:if="{{activeTab === 'today'}}">
-    <view class="card">
+  <!-- 回寝顺序 -->
+  <view wx:if="{{activeTab === 'today'}}">
+    <scroll-view scroll-x="true" class="date-scroll" enable-flex>
+      <view wx:for="{{weekRange}}" wx:key="date"
+            class="date-chip {{selectedDate === item.date ? 'active' : ''}}"
+            data-date="{{item.date}}"
+            bindtap="onSelectDate">
+        <view class="chip-weekday">{{item.isToday ? '今天' : '周' + item.weekday}}</view>
+        <view class="chip-day serif">{{item.day}}</view>
+      </view>
+    </scroll-view>
+
+    <view class="sheet timeline">
       <view wx:if="{{todayCheckinList.length === 0}}" class="empty">
-        <view class="empty-icon">🌙</view>
-        <view class="empty-text">今天还没有人登记预计回寝</view>
-        <view class="empty-tip">做第一个登记的人吧</view>
+        <view class="empty-text">{{selectedDate === todayDate ? '今晚还没有人登记' : '这天没有人登记'}}</view>
+        <view class="empty-tip" wx:if="{{selectedDate === todayDate}}">选个时间，做第一个亮灯的人</view>
       </view>
 
-      <view wx:for="{{todayCheckinList}}" wx:key="_id" class="rank-item" data-item="{{item}}" bindtap="onItemTap">
-        <view class="rank-no {{index < 3 ? 'top' : ''}}">{{index + 1}}</view>
-        <image class="rank-avatar" src="{{item.avatarUrl || 'images/profile.png'}}" mode="aspectFill"></image>
-        <view class="rank-info">
-          <view class="rank-name">
-            {{item.nickname}}
-            <text wx:if="{{item._openid === openid}}" class="me-tag">我</text>
-          </view>
-          <view class="rank-time">
-            预计 {{item.timeText}} 回寝
-          </view>
+      <view wx:for="{{todayCheckinList}}" wx:key="_id" class="tl-row" data-item="{{item}}" bindtap="onItemTap">
+        <view class="tl-time serif">{{item.timeText}}</view>
+        <view class="tl-rail {{index === 0 ? 'first' : ''}} {{index === todayCheckinList.length - 1 ? 'last' : ''}}">
+          <view class="tl-dot {{item.arrivedText ? 'arrived' : ''}}"></view>
         </view>
-        <view class="rank-badge" wx:if="{{index === 0}}">🥇 最早</view>
-        <view class="rank-badge rank-late" wx:elif="{{index === todayCheckinList.length - 1 && todayCheckinList.length > 1}}">🌙 最晚</view>
+        <image class="avatar-sm" src="{{item.avatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
+        <view class="tl-name">
+          {{item.nickname}}<text wx:if="{{item._openid === openid}}" class="me-tag">我</text>
+        </view>
+        <view class="tl-note arrived" wx:if="{{item.arrivedText}}">{{item.arrivedText}} 已到</view>
+        <view class="tl-note" wx:elif="{{index === 0 && todayCheckinList.length > 1}}">最早</view>
+        <view class="tl-note late" wx:elif="{{index === todayCheckinList.length - 1 && todayCheckinList.length > 1}}">最晚</view>
       </view>
-    </view>
-
-    <view class="date-tabs">
-      <view class="date-tip">查看其他日期 ↓</view>
-      <scroll-view scroll-x="true" class="date-scroll" enable-flex>
-        <view wx:for="{{weekRange}}" wx:key="date"
-              class="date-chip {{selectedDate === item.date ? 'active' : ''}}"
-              data-date="{{item.date}}"
-              bindtap="onSelectDate">
-          <view class="chip-weekday">
-            <block wx:if="{{item.isToday}}">今</block>
-            <block wx:else>周{{item.weekday}}</block>
-          </view>
-          <view class="chip-day">{{item.day}}</view>
-        </view>
-      </scroll-view>
     </view>
   </view>
 
-  <!-- 我的记录 -->
-  <view class="content" wx:if="{{activeTab === 'history'}}">
-    <view class="card">
-      <view class="section-title">最近 7 天登记情况</view>
-      <view wx:for="{{history}}" wx:key="date" class="history-row">
-        <view class="history-date">
-          <view class="history-day">{{item.day}}</view>
-          <view class="history-weekday">{{item.weekday}}</view>
-        </view>
-        <view class="history-status {{item.checked ? 'checked' : 'missed'}}">
-          <text wx:if="{{item.checked}}">✓</text>
-          <text wx:else>—</text>
-        </view>
-        <view class="history-time">{{item.time || (item.isToday ? '今日未登记' : '未登记')}}</view>
-      </view>
+  <!-- 我的 7 天 -->
+  <view wx:if="{{activeTab === 'history'}}" class="sheet week">
+    <view wx:for="{{history}}" wx:key="date" class="day {{item.isToday ? 'today' : ''}}">
+      <view class="day-weekday">{{item.isToday ? '今天' : '周' + item.weekday}}</view>
+      <view class="day-num serif">{{item.day}}</view>
+      <view class="day-window {{item.checked ? 'lit' : ''}}"></view>
+      <view class="day-time {{item.checked ? '' : 'none'}}">{{item.time || '—'}}</view>
     </view>
   </view>
 </view>
