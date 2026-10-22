@@ -34,7 +34,7 @@
       },
       {
         "pagePath": "pages/lottery/lottery",
-        "text": "鹿关抽签",
+        "text": "自律抽签",
         "iconPath": "images/lottery.png",
         "selectedIconPath": "images/lottery-active.png"
       },

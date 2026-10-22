@@ -213,8 +213,8 @@ Page({
   onShareAppMessage() {
     return {
       title: this.data.myResult
-        ? `我今天抽到了【${this.data.myResult}】，一起来鹿关抽签！`
-        : '鹿关抽签 - 今日运势是鹿还是不鹿？',
+        ? `我今天抽到了【${this.data.myResult}】，一起来自律抽签！`
+        : '自律抽签 - 今日运势是鹿还是不鹿？',
       path: '/pages/lottery/lottery'
     }
   },

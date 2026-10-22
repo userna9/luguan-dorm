@@ -66,7 +66,7 @@
     <view class="entry" bindtap="goToLottery" hover-class="entry-hover">
       <image class="entry-icon" src="/images/ic-lottery.png"></image>
       <view class="entry-body">
-        <view class="entry-title">鹿关抽签</view>
+        <view class="entry-title">自律抽签</view>
         <view class="entry-desc">{{hasLotteryToday ? '今天已抽过签' : '每日一签，鹿还是不鹿'}}</view>
       </view>
       <view class="entry-dot" wx:if="{{!hasLotteryToday}}"></view>
@@ -170,7 +170,7 @@
 <!-- 引导设置昵称弹窗 -->
 <view class="modal-mask {{keyboardUp ? 'keyboard-up' : ''}}" wx:if="{{showProfileModal}}" bindtap="closeProfileModal">
   <view class="modal-card" catchtap="noop">
-    <view class="modal-title">欢迎回到鹿关</view>
+    <view class="modal-title">欢迎回到宿舍</view>
     <view class="modal-subtitle">设个昵称和头像，室友才认得出你</view>
 
     <view class="form-item">

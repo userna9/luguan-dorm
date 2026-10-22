@@ -3,7 +3,7 @@
   <view class="me">
     <image class="me-avatar" src="{{avatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
     <view class="me-name serif">{{nickname || '还没设置昵称'}}</view>
-    <view class="me-sub">鹿关宿舍成员</view>
+    <view class="me-sub">宿舍成员</view>
     <view class="me-edit" bindtap="onEditProfile">编辑资料</view>
   </view>
 
@@ -36,7 +36,7 @@
   </view>
 
   <!-- 抽签 -->
-  <view class="section-head"><text class="h">鹿关抽签</text></view>
+  <view class="section-head"><text class="h">自律抽签</text></view>
   <view class="sheet stats">
     <view class="figures">
       <view class="figure">
