@@ -36,7 +36,7 @@ cd luguan-dorm
 git status               # 先看第一行是不是 On branch main（不是就先看第 11 节）
 git checkout main        # 切到主分支
 git pull                 # 拉最新代码
-git checkout -b feature/打卡排行   # 开自己的分支
+git checkout -b feature/checkin-rank   # 开自己的分支
 ```
 
 **这几行是"同时开发不打架"的核心**，养成肌肉记忆。
@@ -55,7 +55,7 @@ git add .                   # 全部加入暂存
 git add miniprogram/pages/moments/moments.js   # 只加某个文件
 git diff --staged           # 提交前最后检查（看暂存了什么）
 git commit -m "feat: 打卡排行周榜"
-git push -u origin feature/打卡排行
+git push -u origin feature/checkin-rank
 ```
 
 > 第一次推新分支用 `-u` 建立追踪，之后直接 `git push` 就行。
@@ -84,10 +84,22 @@ git branch -D feature/xxx     # 强制删除（没合并的）
 git merge feature/xxx         # 把 xxx 合并到当前分支
 ```
 
+> **分支名用英文或拼音，别用中文。**
+> 中文分支名本地能用，但推到 GitHub 后 URL 会变成一长串 `%E6%89%93...`，
+> 部分工具里还会显示乱码，协作时容易出问题。
+>
+> 起名建议：`feature/duty-roster`（值日表）、`feature/meal-reminder`（吃饭提醒）、`fix/nickname-input`
+>
+> 重命名已有分支：
+>
+> ```bash
+> git branch -m feature/旧名字 feature/new-name   # 不在该分支上时
+> git branch -m feature/new-name                  # 正在该分支上时
+> ```
+
 ---
 
 ## 5. 查看历史
-
 ```bash
 git log --oneline -10                 # 最近 10 条
 git log --oneline --graph --all       # 图形化看分支结构
