@@ -207,19 +207,25 @@ git reset --hard c0ed819
 
 ---
 
-## 11. 游离 HEAD：看起来正常，其实是旧代码 ⚠️
+## 11. 游离 HEAD / 哈希分支名：看起来正常，其实是旧代码 ⚠️
 
 **症状**：代码能编译、能运行，一切正常，但界面/功能是老的。
 别人明明提交了，你 `git pull` 也没变化——**因为这个状态下 pull 根本不在 main 上**。
 
-**怎么认**：`git status` 第一行是
+**怎么认**：`git status` 第一行不是 `On branch main` 也不是 `On branch feature/xxx`，而是：
 
 ```
-On branch c0ed819
+On branch c0ed819          ← 一个被命名成哈希的分支
+```
+或
+```
+HEAD detached at c0ed819   ← 真正的游离 HEAD
 ```
 
-`On branch` 后面跟着**一串哈希而不是分支名**，就是游离 HEAD（detached HEAD）。
-意思是工作区被检出到了某个**具体提交**，而不是某个分支。
+**两种情况效果一样：你不在正常分支上，看到的是旧代码。**
+
+- `On branch <哈希>`：有一个分支**名字就叫这串哈希**（微信开发者工具的「Create Branch at Commit」会这样建）
+- `HEAD detached at <哈希>`：真正的游离 HEAD，工作区停在某个提交上
 
 **为什么危险**：这个状态下改的代码**不属于任何分支**，一旦切走，很容易找不回来。
 
@@ -238,9 +244,17 @@ git checkout main          # 再切回 main
 
 **怎么进去的**（常见原因）：
 
-- 微信开发者工具「**版本管理**」面板里点了某个历史提交的「检出」
+- 微信开发者工具「**版本管理**」面板里点了某个历史提交的「检出 / Create Branch at Commit」
 - 手动执行了 `git checkout <提交哈希>`
 - 写了 `git checkout origin/main`——**这会进游离 HEAD**，正确写法是 `git checkout main`
+
+**顺手清理垃圾分支**（确认没有独有提交后再删）：
+
+```bash
+git branch -vv                              # 看各分支位置，确认没有落后的独有提交
+git branch -d c0ed819                       # 删掉那个哈希名分支
+git branch -d feature/打算加功能            # 删掉不再用的分支
+```
 
 > 记住一条：**看到 `On branch <哈希>`，第一件事就是 `git checkout main`。**
 
